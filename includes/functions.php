@@ -425,92 +425,109 @@ function getApplicationsByUser($userId) {
 }
 
 /**
- * Search jobs by keywords, location, and additional filters
- * 
- * @param string $keywords Keywords to search for
- * @param string $location Location to search in
- * @param array $jobTypes Array of job types to filter by
- * @param int $minSalary Minimum salary to filter by
- * @param string $datePosted Date filter (any, today, week, month)
- * @param string $sort Sorting method (newest, salary_high, salary_low, company)
- * @return array Array of jobs matching the search criteria
+ * 高级职位搜索函数
  */
-function searchJobs($keywords = '', $location = '', $jobTypes = [], $minSalary = 0, $datePosted = 'any', $sort = 'newest') {
-    $sql = "SELECT j.*, c.company_name 
-            FROM jobs j 
-            JOIN companies c ON j.company_id = c.company_id 
-            WHERE j.is_active = 1";
-    $types = '';
+function searchJobs($keywords, $location, $workClassifications = [], $workTypes = [], $salaryMin = null, $salaryMax = null, $skills = [], $datePosted = 'any', $sort = 'newest') {
     $params = [];
+    $types = '';
+    $conditions = ['j.is_active = 1'];
     
-    // Add keyword search
+    // 关键词搜索
     if (!empty($keywords)) {
-        $sql .= " AND (j.job_title LIKE ? OR j.description LIKE ? OR j.requirements LIKE ? OR j.job_type LIKE ?)";
-        $types .= 'ssss';
-        $keywordParam = '%' . $keywords . '%';
-        $params = array_merge($params, [$keywordParam, $keywordParam, $keywordParam, $keywordParam]);
+        $conditions[] = "(j.job_title LIKE ? OR j.description LIKE ? OR c.company_name LIKE ?)";
+        $keyword = "%$keywords%";
+        $params[] = $keyword;
+        $params[] = $keyword;
+        $params[] = $keyword;
+        $types .= 'sss';
     }
     
-    // Add location search
+    // 地点搜索
     if (!empty($location)) {
-        $sql .= " AND j.location LIKE ?";
-        $types .= 's';
-        $params[] = '%' . $location . '%';
+        $conditions[] = "(l.name LIKE ? OR l.region LIKE ?)";
+        $locationParam = "%$location%";
+        $params[] = $locationParam;
+        $params[] = $locationParam;
+        $types .= 'ss';
     }
     
-    // Filter by job types
-    if (!empty($jobTypes)) {
-        $placeholders = implode(',', array_fill(0, count($jobTypes), '?'));
-        $sql .= " AND j.job_type IN ($placeholders)";
-        
-        foreach ($jobTypes as $type) {
-            $types .= 's';
-            $params[] = $type;
-        }
+    // 工作分类过滤
+    if (!empty($workClassifications)) {
+        $placeholders = str_repeat('?,', count($workClassifications) - 1) . '?';
+        $conditions[] = "j.work_classification_id IN ($placeholders)";
+        $params = array_merge($params, $workClassifications);
+        $types .= str_repeat('i', count($workClassifications));
     }
     
-    // Filter by minimum salary
-    if (!empty($minSalary) && $minSalary > 0) {
-        $sql .= " AND j.salary_min >= ?";
+    // 工作类型过滤
+    if (!empty($workTypes)) {
+        $placeholders = str_repeat('?,', count($workTypes) - 1) . '?';
+        $conditions[] = "j.work_type_id IN ($placeholders)";
+        $params = array_merge($params, $workTypes);
+        $types .= str_repeat('i', count($workTypes));
+    }
+    
+    // 薪资范围过滤
+    if ($salaryMin !== null) {
+        $conditions[] = "j.salary_max >= ?";
+        $params[] = $salaryMin;
         $types .= 'd';
-        $params[] = $minSalary;
+    }
+    if ($salaryMax !== null) {
+        $conditions[] = "j.salary_min <= ?";
+        $params[] = $salaryMax;
+        $types .= 'd';
     }
     
-    // Filter by date posted
+    // 技能要求过滤
+    if (!empty($skills)) {
+        $placeholders = str_repeat('?,', count($skills) - 1) . '?';
+        $conditions[] = "EXISTS (
+            SELECT 1 FROM job_skills js 
+            WHERE js.job_id = j.job_id 
+            AND js.skill_id IN ($placeholders)
+        )";
+        $params = array_merge($params, $skills);
+        $types .= str_repeat('i', count($skills));
+    }
+    
+    // 发布日期过滤
     if ($datePosted != 'any') {
-        $date = new DateTime();
         switch ($datePosted) {
             case 'today':
-                $date->modify('-1 day');
+                $conditions[] = "DATE(j.posted_date) = CURDATE()";
                 break;
             case 'week':
-                $date->modify('-7 days');
+                $conditions[] = "j.posted_date >= DATE_SUB(NOW(), INTERVAL 1 WEEK)";
                 break;
             case 'month':
-                $date->modify('-30 days');
+                $conditions[] = "j.posted_date >= DATE_SUB(NOW(), INTERVAL 1 MONTH)";
                 break;
         }
-        $dateString = $date->format('Y-m-d');
-        $sql .= " AND DATE(j.posted_date) >= ?";
-        $types .= 's';
-        $params[] = $dateString;
     }
     
-    // Add sorting
+    // 构建SQL查询
+    $sql = "SELECT DISTINCT j.*, c.company_name, wc.name as classification_name, wt.name as work_type_name, l.name as location_name 
+            FROM jobs j 
+            JOIN companies c ON j.company_id = c.company_id 
+            LEFT JOIN work_classifications wc ON j.work_classification_id = wc.classification_id
+            LEFT JOIN work_types wt ON j.work_type_id = wt.type_id
+            LEFT JOIN locations l ON j.location_id = l.location_id
+            WHERE " . implode(' AND ', $conditions);
+    
+    // 排序
     switch ($sort) {
         case 'salary_high':
-            $sql .= " ORDER BY j.salary_max DESC, j.salary_min DESC, j.posted_date DESC";
+            $sql .= " ORDER BY j.salary_max DESC";
             break;
         case 'salary_low':
-            $sql .= " ORDER BY j.salary_min ASC, j.salary_max ASC, j.posted_date DESC";
+            $sql .= " ORDER BY j.salary_min ASC";
             break;
-        case 'company':
-            $sql .= " ORDER BY c.company_name ASC, j.posted_date DESC";
+        case 'oldest':
+            $sql .= " ORDER BY j.posted_date ASC";
             break;
-        case 'newest':
-        default:
+        default: // newest
             $sql .= " ORDER BY j.posted_date DESC";
-            break;
     }
     
     return fetchAll($sql, $types, $params);
