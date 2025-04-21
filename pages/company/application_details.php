@@ -63,7 +63,12 @@ if ($application['status'] === 'Pending') {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
     $newStatus = sanitizeInput($_POST['status']);
     
-    if (in_array($newStatus, ['Pending', 'Viewed', 'Shortlisted', 'Rejected'])) {
+    // Check if application is already withdrawn - if so, don't allow status changes
+    if ($application['status'] === 'Withdrawn') {
+        $_SESSION['error'] = 'Cannot modify status of withdrawn applications';
+    }
+    // Otherwise proceed with the status update
+    else if (in_array($newStatus, ['Pending', 'Viewed', 'Shortlisted', 'Rejected'])) {
         $updateResult = updateData('applications', ['status' => $newStatus], 'application_id', $applicationId);
         
         if ($updateResult) {
@@ -126,6 +131,9 @@ require_once '../../includes/header.php';
                         case 'Rejected':
                             $statusClass = 'bg-danger';
                             break;
+                        case 'Withdrawn':
+                            $statusClass = 'bg-secondary';
+                            break;
                     }
                     ?>
                     <div class="mb-3">
@@ -135,6 +143,7 @@ require_once '../../includes/header.php';
                     <h6 class="mb-2">Application Date</h6>
                     <p><?php echo date('F j, Y', strtotime($application['applied_date'])); ?></p>
                     
+                    <?php if ($application['status'] !== 'Withdrawn'): ?>
                     <form action="<?php echo SITE_URL; ?>/pages/company/application_details.php?id=<?php echo $applicationId; ?>" method="POST">
                         <div class="mb-3">
                             <label for="status" class="form-label">Update Status</label>
@@ -147,6 +156,11 @@ require_once '../../includes/header.php';
                         </div>
                         <button type="submit" name="update_status" class="btn btn-primary">Update Status</button>
                     </form>
+                    <?php else: ?>
+                    <div class="alert alert-secondary">
+                        <i class="fas fa-info-circle me-2"></i> This application has been withdrawn by the applicant. Status updates are disabled.
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -177,75 +191,194 @@ require_once '../../includes/header.php';
                         </div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h5 class="mb-3">Contact Information</h5>
-                            <dl>
-                                <?php if (isset($application['address']) && $application['address']): ?>
-                                    <dt>Address</dt>
-                                    <dd><?php echo htmlspecialchars($application['address']); ?></dd>
-                                <?php endif; ?>
-                                
-                                <?php
-                                $location = [];
-                                if (isset($application['city']) && $application['city']) $location[] = htmlspecialchars($application['city']);
-                                if (isset($application['state']) && $application['state']) $location[] = htmlspecialchars($application['state']);
-                                if (isset($application['country']) && $application['country']) $location[] = htmlspecialchars($application['country']);
-                                
-                                if (!empty($location)):
-                                ?>
-                                    <dt>Location</dt>
-                                    <dd><?php echo implode(', ', $location); ?></dd>
-                                <?php endif; ?>
-                            </dl>
+                    <!-- Nav tabs for profile sections -->
+                    <ul class="nav nav-tabs mb-3" id="profileTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="true">Contact Info</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="education-tab" data-bs-toggle="tab" data-bs-target="#education" type="button" role="tab" aria-controls="education" aria-selected="false">Education</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="experience-tab" data-bs-toggle="tab" data-bs-target="#experience" type="button" role="tab" aria-controls="experience" aria-selected="false">Work Experience</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="skills-tab" data-bs-toggle="tab" data-bs-target="#skills" type="button" role="tab" aria-controls="skills" aria-selected="false">Skills</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="resume-tab" data-bs-toggle="tab" data-bs-target="#resume" type="button" role="tab" aria-controls="resume" aria-selected="false">Resume</button>
+                        </li>
+                    </ul>
+                    
+                    <!-- Tab content -->
+                    <div class="tab-content" id="profileTabsContent">
+                        <!-- Contact Information Tab -->
+                        <div class="tab-pane fade show active" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h5 class="mb-3">Contact Information</h5>
+                                    <dl>
+                                        <?php if (isset($application['address']) && $application['address']): ?>
+                                            <dt>Address</dt>
+                                            <dd><?php echo htmlspecialchars($application['address']); ?></dd>
+                                        <?php endif; ?>
+                                        
+                                        <?php
+                                        $location = [];
+                                        if (isset($application['city']) && $application['city']) $location[] = htmlspecialchars($application['city']);
+                                        if (isset($application['state']) && $application['state']) $location[] = htmlspecialchars($application['state']);
+                                        if (isset($application['country']) && $application['country']) $location[] = htmlspecialchars($application['country']);
+                                        
+                                        if (!empty($location)):
+                                        ?>
+                                            <dt>Location</dt>
+                                            <dd><?php echo implode(', ', $location); ?></dd>
+                                        <?php endif; ?>
+                                    </dl>
+                                </div>
+                            </div>
                         </div>
                         
-                        <div class="col-md-6">
-                            <h5 class="mb-3">Education</h5>
-                            <?php if (isset($application['education']) && $application['education']): ?>
-                                <p><?php echo nl2br(htmlspecialchars($application['education'])); ?></p>
+                        <!-- Education Tab -->
+                        <div class="tab-pane fade" id="education" role="tabpanel" aria-labelledby="education-tab">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h5 class="mb-3">Education</h5>
+                                    <?php if (isset($application['education']) && $application['education']): ?>
+                                        <p><?php echo nl2br(htmlspecialchars($application['education'])); ?></p>
+                                    <?php else: ?>
+                                        <p class="text-muted">No education information provided.</p>
+                                    <?php endif; ?>
+                                    
+                                    <?php 
+                                    // Get additional education fields
+                                    $userProfile = getUserProfile($application['user_id']);
+                                    if ($userProfile):
+                                    ?>
+                                        <?php if (!empty($userProfile['institution'])): ?>
+                                            <div class="mb-3">
+                                                <h6>Institution</h6>
+                                                <p><?php echo htmlspecialchars($userProfile['institution']); ?>
+                                                <?php if (!empty($userProfile['completion_status'])): ?>
+                                                    <span class="badge bg-secondary"><?php echo htmlspecialchars($userProfile['completion_status']); ?></span>
+                                                <?php endif; ?>
+                                                </p>
+                                            </div>
+                                        <?php endif; ?>
+                                        
+                                        <?php if (!empty($userProfile['education_highlights'])): ?>
+                                            <div class="mb-3">
+                                                <h6>Education Highlights</h6>
+                                                <p><?php echo nl2br(htmlspecialchars($userProfile['education_highlights'])); ?></p>
+                                            </div>
+                                        <?php endif; ?>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Work Experience Tab -->
+                        <div class="tab-pane fade" id="experience" role="tabpanel" aria-labelledby="experience-tab">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h5 class="mb-3">Work Experience</h5>
+                                    <?php 
+                                    // Get career history
+                                    $careerHistory = getUserCareerHistory($application['user_id']);
+                                    if (!empty($careerHistory)):
+                                    ?>
+                                        <div class="timeline">
+                                            <?php foreach ($careerHistory as $job): ?>
+                                                <div class="card mb-3 border-start border-primary border-3">
+                                                    <div class="card-body">
+                                                        <h6 class="fw-bold"><?php echo htmlspecialchars($job['job_title']); ?></h6>
+                                                        <p class="mb-1"><?php echo htmlspecialchars($job['company_name']); ?></p>
+                                                        <p class="text-muted small mb-2">
+                                                            <?php 
+                                                            echo date('M Y', strtotime($job['start_date'])); 
+                                                            echo ' - '; 
+                                                            echo !empty($job['end_date']) ? date('M Y', strtotime($job['end_date'])) : 'Present';
+                                                            ?>
+                                                        </p>
+                                                        <?php if (!empty($job['description'])): ?>
+                                                            <p class="mb-0"><?php echo nl2br(htmlspecialchars($job['description'])); ?></p>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php else: ?>
+                                        <p class="text-muted">No work experience information provided.</p>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Skills Tab -->
+                        <div class="tab-pane fade" id="skills" role="tabpanel" aria-labelledby="skills-tab">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h5 class="mb-3">Skills</h5>
+                                    <?php 
+                                    // Get skills from user profile
+                                    if ($userProfile && !empty($userProfile['skills'])):
+                                        $skills = explode(',', $userProfile['skills']);
+                                    ?>
+                                        <div>
+                                            <?php foreach ($skills as $skill): ?>
+                                                <?php $skill = trim($skill); ?>
+                                                <?php if (!empty($skill)): ?>
+                                                    <span class="badge bg-primary p-2 me-2 mb-2"><?php echo htmlspecialchars($skill); ?></span>
+                                                <?php endif; ?>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php else: ?>
+                                        <p class="text-muted">No skills information provided.</p>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Resume Tab -->
+                        <div class="tab-pane fade" id="resume" role="tabpanel" aria-labelledby="resume-tab">
+                            <?php
+                            $resumePath = '';
+                            
+                            // Check if application has a specific resume path
+                            if (isset($application['resume_path']) && $application['resume_path']) {
+                                $resumePath = $application['resume_path'];
+                            }
+                            // Otherwise, check if user has a resume in their profile
+                            else {
+                                $userProfile = getUserProfile($application['user_id']);
+                                if ($userProfile && isset($userProfile['resume_path']) && $userProfile['resume_path']) {
+                                    $resumePath = $userProfile['resume_path'];
+                                }
+                            }
+                            
+                            if ($resumePath):
+                            ?>
+                                <div class="mb-3">
+                                    <h5 class="mb-3">Resume</h5>
+                                    <div class="mb-3">
+                                        <a href="<?php echo SITE_URL; ?>/uploads/resumes/<?php echo $resumePath; ?>" class="btn btn-outline-primary" target="_blank">
+                                            <i class="fas fa-file-pdf me-2"></i> View Resume
+                                        </a>
+                                        <a href="<?php echo SITE_URL; ?>/uploads/resumes/<?php echo $resumePath; ?>" class="btn btn-outline-secondary ms-2" download>
+                                            <i class="fas fa-download me-2"></i> Download Resume
+                                        </a>
+                                    </div>
+                                    
+                                    <div class="ratio ratio-16x9">
+                                        <iframe src="<?php echo SITE_URL; ?>/uploads/resumes/<?php echo $resumePath; ?>" allowfullscreen></iframe>
+                                    </div>
+                                </div>
                             <?php else: ?>
-                                <p class="text-muted">No education information provided.</p>
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i> No resume available for this application.
+                                </div>
                             <?php endif; ?>
                         </div>
-                    </div>
-                    
-                    <div class="mt-4">
-                        <h5 class="mb-3">Resume</h5>
-                        <?php
-                        $resumePath = '';
-                        
-                        // Check if application has a specific resume path
-                        if (isset($application['resume_path']) && $application['resume_path']) {
-                            $resumePath = $application['resume_path'];
-                        }
-                        // Otherwise, check if user has a resume in their profile
-                        else {
-                            $userProfile = getUserProfile($application['user_id']);
-                            if ($userProfile && isset($userProfile['resume_path']) && $userProfile['resume_path']) {
-                                $resumePath = $userProfile['resume_path'];
-                            }
-                        }
-                        
-                        if ($resumePath):
-                        ?>
-                            <div class="mb-3">
-                                <a href="<?php echo SITE_URL; ?>/uploads/resumes/<?php echo $resumePath; ?>" class="btn btn-outline-primary" target="_blank">
-                                    <i class="fas fa-file-pdf me-2"></i> View Resume
-                                </a>
-                                <a href="<?php echo SITE_URL; ?>/uploads/resumes/<?php echo $resumePath; ?>" class="btn btn-outline-secondary ms-2" download>
-                                    <i class="fas fa-download me-2"></i> Download Resume
-                                </a>
-                            </div>
-                            
-                            <div class="ratio ratio-16x9">
-                                <iframe src="<?php echo SITE_URL; ?>/uploads/resumes/<?php echo $resumePath; ?>" allowfullscreen></iframe>
-                            </div>
-                        <?php else: ?>
-                            <div class="alert alert-warning">
-                                <i class="fas fa-exclamation-triangle me-2"></i> No resume available for this application.
-                            </div>
-                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -259,7 +392,7 @@ require_once '../../includes/header.php';
                     <i class="fas fa-arrow-left me-2"></i> Back to Applications
                 </a>
                 
-                <?php if ($application['status'] !== 'Rejected'): ?>
+                <?php if ($application['status'] !== 'Rejected' && $application['status'] !== 'Withdrawn'): ?>
                     <div>
                         <a href="mailto:<?php echo $application['email']; ?>" class="btn btn-outline-primary">
                             <i class="fas fa-envelope me-2"></i> Contact Applicant
@@ -273,6 +406,15 @@ require_once '../../includes/header.php';
                         
                         <button type="button" class="btn btn-danger ms-2" data-bs-toggle="modal" data-bs-target="#rejectModal">
                             <i class="fas fa-times me-2"></i> Reject
+                        </button>
+                    </div>
+                <?php elseif ($application['status'] === 'Withdrawn'): ?>
+                    <div>
+                        <a href="mailto:<?php echo $application['email']; ?>" class="btn btn-outline-primary">
+                            <i class="fas fa-envelope me-2"></i> Contact Applicant
+                        </a>
+                        <button type="button" class="btn btn-outline-danger ms-2" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            <i class="fas fa-trash me-2"></i> Delete Application
                         </button>
                     </div>
                 <?php else: ?>
@@ -335,6 +477,43 @@ require_once '../../includes/header.php';
         </div>
     </div>
 </div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Delete Application</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to permanently delete this application?</p>
+                <p>Name: <strong><?php echo isset($application['full_name']) && $application['full_name'] ? htmlspecialchars($application['full_name']) : htmlspecialchars($application['username']); ?></strong></p>
+                <p class="text-danger"><i class="fas fa-exclamation-triangle me-2"></i> This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="<?php echo SITE_URL; ?>/api/jobs/delete_application.php?id=<?php echo $applicationId; ?>" class="btn btn-danger">Delete Application</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Style for timeline -->
+<style>
+.timeline .card {
+    position: relative;
+}
+.timeline .card:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 100%;
+    height: 20px;
+    width: 2px;
+    background-color: #dee2e6;
+}
+</style>
 
 <?php
 // Include footer

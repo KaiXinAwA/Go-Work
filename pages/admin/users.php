@@ -14,26 +14,23 @@ if (!isLoggedIn() || !hasUserType(USER_TYPE_ADMIN)) {
 $userType = isset($_GET['type']) ? (int)$_GET['type'] : 0;
 $searchTerm = isset($_GET['search']) ? sanitizeInput($_GET['search']) : '';
 
-// Build query based on filters
-$sql = "SELECT * FROM users";
+// Build query based on filters - EXCLUDE GoWork workers and administrators
+$sql = "SELECT * FROM users WHERE user_type NOT IN (3, 4)"; // Exclude GoWork workers and admins
 $types = '';
 $params = [];
-$whereAdded = false;
+$whereAdded = true; // We already added WHERE clause
 
 if ($userType > 0) {
-    $sql .= " WHERE user_type = ?";
-    $types .= 'i';
-    $params[] = $userType;
-    $whereAdded = true;
+    // Only allow filtering by job seeker or company types
+    if ($userType == USER_TYPE_JOBSEEKER || $userType == USER_TYPE_COMPANY) {
+        $sql .= " AND user_type = ?";
+        $types .= 'i';
+        $params[] = $userType;
+    }
 }
 
 if (!empty($searchTerm)) {
-    if ($whereAdded) {
-        $sql .= " AND (username LIKE ? OR email LIKE ?)";
-    } else {
-        $sql .= " WHERE (username LIKE ? OR email LIKE ?)";
-        $whereAdded = true;
-    }
+    $sql .= " AND (username LIKE ? OR email LIKE ?)";
     $types .= 'ss';
     $searchParam = '%' . $searchTerm . '%';
     $params = array_merge($params, [$searchParam, $searchParam]);
@@ -80,8 +77,7 @@ require_once '../../includes/header.php';
                                     <option value="0" <?php echo $userType === 0 ? 'selected' : ''; ?>>All Types</option>
                                     <option value="<?php echo USER_TYPE_JOBSEEKER; ?>" <?php echo $userType === USER_TYPE_JOBSEEKER ? 'selected' : ''; ?>>Job Seekers</option>
                                     <option value="<?php echo USER_TYPE_COMPANY; ?>" <?php echo $userType === USER_TYPE_COMPANY ? 'selected' : ''; ?>>Companies</option>
-                                    <option value="<?php echo USER_TYPE_GOWORK; ?>" <?php echo $userType === USER_TYPE_GOWORK ? 'selected' : ''; ?>>GoWork Workers</option>
-                                    <option value="<?php echo USER_TYPE_ADMIN; ?>" <?php echo $userType === USER_TYPE_ADMIN ? 'selected' : ''; ?>>Administrators</option>
+                                    <!-- Removed GoWork workers and Admin options -->
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3 mb-md-0">
@@ -136,14 +132,7 @@ require_once '../../includes/header.php';
                                                         $userTypeText = 'Company';
                                                         $typeClass = 'bg-success';
                                                         break;
-                                                    case USER_TYPE_GOWORK:
-                                                        $userTypeText = 'GoWork';
-                                                        $typeClass = 'bg-info';
-                                                        break;
-                                                    case USER_TYPE_ADMIN:
-                                                        $userTypeText = 'Admin';
-                                                        $typeClass = 'bg-danger';
-                                                        break;
+                                                    // Removed case for GoWork workers and Admins since they're excluded
                                                 }
                                                 ?>
                                                 <span class="badge <?php echo $typeClass; ?>"><?php echo $userTypeText; ?></span>

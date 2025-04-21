@@ -131,6 +131,7 @@ require_once '../../includes/header.php';
                                         <option value="Viewed">Viewed</option>
                                         <option value="Shortlisted">Shortlisted</option>
                                         <option value="Rejected">Rejected</option>
+                                        <option value="Withdrawn">Withdrawn</option>
                                     </select>
                                 </div>
                             </div>
@@ -152,7 +153,7 @@ require_once '../../includes/header.php';
                                 </thead>
                                 <tbody>
                                     <?php foreach ($applications as $application): ?>
-                                        <tr>
+                                        <tr data-status="<?php echo htmlspecialchars($application['status']); ?>">
                                             <td>
                                                 <div class="d-flex align-items-center">
                                                     <div class="avatar-sm bg-light rounded-circle text-center me-2" style="width: 40px; height: 40px; line-height: 40px;">
@@ -206,6 +207,9 @@ require_once '../../includes/header.php';
                                                     case 'Rejected':
                                                         $statusClass = 'badge bg-danger';
                                                         break;
+                                                    case 'Withdrawn':
+                                                        $statusClass = 'badge bg-secondary';
+                                                        break;
                                                     default:
                                                         $statusClass = 'badge bg-secondary';
                                                 }
@@ -216,33 +220,47 @@ require_once '../../includes/header.php';
                                             </td>
                                             
                                             <td>
-                                                <div class="dropdown">
-                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton<?php echo $application['application_id']; ?>" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        Actions
+                                                <div class="d-flex gap-1">
+                                                    <a class="btn btn-sm btn-outline-primary" href="<?php echo SITE_URL; ?>/pages/company/application_details.php?id=<?php echo $application['application_id']; ?>" title="View Details">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <?php if ($application['status'] !== 'Withdrawn'): ?>
+                                                    <a class="btn btn-sm <?php echo $application['status'] === 'Viewed' ? 'btn-info text-white' : 'btn-outline-info'; ?>" href="<?php echo SITE_URL; ?>/api/jobs/update_application_status.php?id=<?php echo $application['application_id']; ?>&status=Viewed" title="Mark as Viewed">
+                                                        <i class="fas fa-check"></i>
+                                                    </a>
+                                                    <a class="btn btn-sm <?php echo $application['status'] === 'Shortlisted' ? 'btn-success' : 'btn-outline-success'; ?>" href="<?php echo SITE_URL; ?>/api/jobs/update_application_status.php?id=<?php echo $application['application_id']; ?>&status=Shortlisted" title="Shortlist">
+                                                        <i class="fas fa-star"></i>
+                                                    </a>
+                                                    <a class="btn btn-sm <?php echo $application['status'] === 'Rejected' ? 'btn-danger' : 'btn-outline-danger'; ?>" href="<?php echo SITE_URL; ?>/api/jobs/update_application_status.php?id=<?php echo $application['application_id']; ?>&status=Rejected" title="Reject">
+                                                        <i class="fas fa-times"></i>
+                                                    </a>
+                                                    <?php else: ?>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal<?php echo $application['application_id']; ?>" title="Delete Application">
+                                                        <i class="fas fa-trash"></i>
                                                     </button>
-                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton<?php echo $application['application_id']; ?>">
-                                                        <li>
-                                                            <a class="dropdown-item" href="<?php echo SITE_URL; ?>/pages/company/application_details.php?id=<?php echo $application['application_id']; ?>">
-                                                                <i class="fas fa-eye me-1"></i> View Details
-                                                            </a>
-                                                        </li>
-                                                        <li><hr class="dropdown-divider"></li>
-                                                        <li>
-                                                            <a class="dropdown-item <?php echo $application['status'] === 'Viewed' ? 'active' : ''; ?>" href="<?php echo SITE_URL; ?>/api/jobs/update_application_status.php?id=<?php echo $application['application_id']; ?>&status=Viewed">
-                                                                <i class="fas fa-check me-1"></i> Mark as Viewed
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a class="dropdown-item <?php echo $application['status'] === 'Shortlisted' ? 'active' : ''; ?>" href="<?php echo SITE_URL; ?>/api/jobs/update_application_status.php?id=<?php echo $application['application_id']; ?>&status=Shortlisted">
-                                                                <i class="fas fa-star me-1"></i> Shortlist
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a class="dropdown-item <?php echo $application['status'] === 'Rejected' ? 'active' : ''; ?>" href="<?php echo SITE_URL; ?>/api/jobs/update_application_status.php?id=<?php echo $application['application_id']; ?>&status=Rejected">
-                                                                <i class="fas fa-times me-1"></i> Reject
-                                                            </a>
-                                                        </li>
-                                                    </ul>
+                                                    
+                                                    <!-- Delete Modal for this application -->
+                                                    <div class="modal fade" id="deleteModal<?php echo $application['application_id']; ?>" tabindex="-1" aria-labelledby="deleteModalLabel<?php echo $application['application_id']; ?>" aria-hidden="true">
+                                                        <div class="modal-dialog">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="deleteModalLabel<?php echo $application['application_id']; ?>">Delete Application</h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <p>Are you sure you want to permanently delete this application?</p>
+                                                                    <p><strong>Applicant:</strong> <?php echo $applicantName; ?></p>
+                                                                    <p><strong>Status:</strong> Withdrawn</p>
+                                                                    <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> This action cannot be undone.</p>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                                    <a href="<?php echo SITE_URL; ?>/api/jobs/delete_application.php?id=<?php echo $application['application_id']; ?>" class="btn btn-danger">Delete Application</a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <?php endif; ?>
                                                 </div>
                                             </td>
                                         </tr>
@@ -255,9 +273,110 @@ require_once '../../includes/header.php';
             <?php endif; ?>
         </div>
     </div>
+    
+    <?php if (!empty($applications)): ?>
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Application Status Guide</h5>
+                </div>
+                <div class="card-body py-2">
+                    <div class="d-flex flex-wrap justify-content-between">
+                        <div class="d-flex align-items-center me-3 mb-2">
+                            <span class="badge bg-warning text-dark me-2">Pending</span>
+                            <span>New application</span>
+                        </div>
+                        <div class="d-flex align-items-center me-3 mb-2">
+                            <span class="badge bg-info text-dark me-2">Viewed</span>
+                            <span><i class="fas fa-check"></i> Application reviewed</span>
+                        </div>
+                        <div class="d-flex align-items-center me-3 mb-2">
+                            <span class="badge bg-success me-2">Shortlisted</span>
+                            <span><i class="fas fa-star"></i> Candidate shortlisted</span>
+                        </div>
+                        <div class="d-flex align-items-center me-3 mb-2">
+                            <span class="badge bg-danger me-2">Rejected</span>
+                            <span><i class="fas fa-times"></i> Application rejected</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="badge bg-secondary me-2">Withdrawn</span>
+                            <span>Candidate withdrew</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
 </div>
 
 <?php
 // Include footer
 require_once '../../includes/footer.php';
 ?>
+
+<script>
+// Application filtering functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchApplicants');
+    const statusFilter = document.getElementById('filterStatus');
+    const applicationRows = document.querySelectorAll('table tbody tr');
+    
+    // Function to filter applications
+    function filterApplications() {
+        // Get filter values
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        const statusValue = statusFilter.value;
+        
+        console.log("Filter by status:", statusValue);
+        
+        // Loop through all rows
+        applicationRows.forEach(row => {
+            // Get applicant name and email for search
+            const applicantData = row.querySelector('td:first-child').textContent.toLowerCase();
+            
+            // Get job title if available (only in "All Applications" view)
+            let jobTitle = '';
+            const jobTitleCell = row.querySelector('td:nth-child(2)');
+            if (jobTitleCell && window.location.href.indexOf('job_id=') === -1) {
+                jobTitle = jobTitleCell.textContent.toLowerCase();
+            }
+            
+            // Get status directly from data-status attribute
+            const rowStatus = row.getAttribute('data-status');
+            
+            console.log("Row status:", rowStatus, "Filter value:", statusValue);
+            
+            // Check if row matches search term
+            const matchesSearch = searchTerm === '' || 
+                               applicantData.includes(searchTerm) || 
+                               jobTitle.includes(searchTerm);
+            
+            // Check if row matches status filter - exact match
+            const matchesStatus = statusValue === '' || rowStatus === statusValue;
+            
+            // Show/hide row based on both filters
+            if (matchesSearch && matchesStatus) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+    
+    // Add event listeners
+    if (searchInput) {
+        searchInput.addEventListener('input', filterApplications);
+    }
+    
+    if (statusFilter) {
+        statusFilter.addEventListener('change', filterApplications);
+        
+        // Apply initial filter if there's a value pre-selected
+        if (statusFilter.value) {
+            filterApplications();
+        }
+    }
+});
+</script>

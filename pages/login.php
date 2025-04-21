@@ -19,7 +19,21 @@ require_once '../includes/header.php';
                     <h3 class="mb-0">Login to Your Account</h3>
                 </div>
                 <div class="card-body">
-                    <div id="alert-container"></div>
+                    <div id="alert-container">
+                        <?php if (isset($_SESSION['error'])): ?>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        <?php endif; ?>
+                        
+                        <?php if (isset($_SESSION['success'])): ?>
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        <?php endif; ?>
+                    </div>
                     
                     <form action="<?php echo SITE_URL; ?>/api/auth/login.php" method="POST">
                         <div class="mb-3">

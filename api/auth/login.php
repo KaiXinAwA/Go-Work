@@ -63,7 +63,15 @@ switch ($user['user_type']) {
         redirectTo(SITE_URL . '/pages/company/dashboard.php');
         break;
     case USER_TYPE_GOWORK:
-        redirectTo(SITE_URL . '/pages/gowork/dashboard.php');
+        // Check if user is a worker
+        $workerId = getWorkerId($user['user_id']);
+        if ($workerId) {
+            // If user is a worker, redirect to worker dashboard
+            redirectTo(SITE_URL . '/pages/worker/dashboard.php');
+        } else {
+            // Otherwise, redirect to regular GoWork dashboard
+            redirectTo(SITE_URL . '/pages/gowork/dashboard.php');
+        }
         break;
     case USER_TYPE_ADMIN:
         redirectTo(SITE_URL . '/pages/admin/dashboard.php');

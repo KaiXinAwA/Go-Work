@@ -190,22 +190,79 @@ function uploadFile($file, $destination, $allowedTypes, $maxSize) {
  * @return boolean True if email sent successfully, false otherwise
  */
 function sendResetPasswordEmail($email, $token, $newPassword) {
-    // You would implement this with your email service (Resend)
-    // This is a placeholder function that would use the Resend API
+    // Get user name if available
+    $user = fetchRow("SELECT * FROM users WHERE email = ?", 's', [$email]);
+    $userName = $user ? $user['username'] : '';
     
+    // Create HTML email using template
+    require_once __DIR__ . '/email_template.php';
+    $htmlContent = getPasswordResetEmailTemplate($userName, $newPassword);
+    $plainTextContent = getTextVersionFromHtml($htmlContent);
+    
+    // Set email headers and content
     $subject = SITE_NAME . ' - Password Reset';
-    $message = "Your password has been reset. Your new password is: {$newPassword}\n\n";
-    $message .= "Please login and change your password immediately.";
     
-    // If Resend API key is not defined, log the email
+    // If Resend API key is not defined or empty, log the email instead of sending
     if (!defined('RESEND_API_KEY') || empty(RESEND_API_KEY)) {
         error_log("Email would be sent to: $email");
         error_log("Subject: $subject");
-        error_log("Message: $message");
-        return true;
+        error_log("Message: " . substr($plainTextContent, 0, 100) . "...");
+        
+        // For debug purposes - log if account doesn't exist
+        if (!$user) {
+            error_log("Note: No user account found with email: $email");
+        }
+        
+        return true; // Return true so the flow continues
     }
     
-    // TODO: Implement actual email sending with Resend when API key is available
+    // Use Resend API to send the email
+    $url = 'https://api.resend.com/emails';
+    $apiKey = RESEND_API_KEY;
+    
+    $data = [
+        'from' => EMAIL_FROM_NAME . ' <' . EMAIL_FROM . '>',
+        'to' => [$email],
+        'subject' => $subject,
+        'html' => $htmlContent,
+        'text' => $plainTextContent
+    ];
+    
+    // Log the request for debugging
+    error_log("Sending email via Resend API to: $email");
+    error_log("Using from address: " . EMAIL_FROM_NAME . ' <' . EMAIL_FROM . '>');
+    
+    // Initialize cURL session
+    $ch = curl_init($url);
+    
+    // Set cURL options
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: Bearer ' . $apiKey,
+        'Content-Type: application/json'
+    ]);
+    
+    // Execute cURL session and get response
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $error = curl_error($ch);
+    
+    // Close cURL session
+    curl_close($ch);
+    
+    // Log any errors
+    if ($httpCode != 200 || $error) {
+        error_log("Failed to send email via Resend API. HTTP Code: $httpCode, Error: $error");
+        error_log("Response: $response");
+        return false;
+    }
+    
+    // Log success
+    error_log("Email sent successfully to: $email, HTTP Code: $httpCode");
+    error_log("Response: $response");
+    
     return true;
 }
 
@@ -262,6 +319,20 @@ function getUserProfile($userId) {
 }
 
 /**
+ * Gets career history for a user
+ * 
+ * @param int $userId The user ID
+ * @return array Array of career history entries
+ */
+function getUserCareerHistory($userId) {
+    return fetchAll(
+        "SELECT * FROM career_history WHERE user_id = ? ORDER BY start_date DESC", 
+        'i', 
+        [$userId]
+    );
+}
+
+/**
  * Gets company profile information
  * 
  * @param int $userId The user ID
@@ -295,14 +366,14 @@ function formatSalaryRange($min, $max) {
     }
     
     if ($min && !$max) {
-        return '$' . number_format($min);
+        return 'RM' . number_format($min);
     }
     
     if (!$min && $max) {
-        return 'Up to $' . number_format($max);
+        return 'Up to RM' . number_format($max);
     }
     
-    return '$' . number_format($min) . ' - $' . number_format($max);
+    return 'RM' . number_format($min) . ' - RM' . number_format($max);
 }
 
 /**
@@ -317,7 +388,26 @@ function getJobTypes() {
         'Contract',
         'Temporary',
         'Internship',
-        'Freelance'
+        'Freelance',
+        'Volunteer',
+        'Remote',
+        'Hybrid',
+        'On-site',
+        'Seasonal',
+        'Apprenticeship',
+        'Consultant',
+        'Per Diem',
+        'Work From Home',
+        'Gig',
+        'Entry-level',
+        'Executive',
+        'Commission-based',
+        'Night Shift',
+        'Travel Nursing',
+        'Tenure-track',
+        'Locum Tenens',
+        'Performing Artist',
+        'Adjunct'
     ];
 }
 
@@ -430,12 +520,14 @@ function getApplicationsByUser($userId) {
  * @param string $keywords Keywords to search for
  * @param string $location Location to search in
  * @param array $jobTypes Array of job types to filter by
+ * @param array $categories Array of categories to filter by
  * @param int $minSalary Minimum salary to filter by
+ * @param int $maxSalary Maximum salary to filter by
  * @param string $datePosted Date filter (any, today, week, month)
  * @param string $sort Sorting method (newest, salary_high, salary_low, company)
  * @return array Array of jobs matching the search criteria
  */
-function searchJobs($keywords = '', $location = '', $jobTypes = [], $minSalary = 0, $datePosted = 'any', $sort = 'newest') {
+function searchJobs($keywords = '', $location = '', $jobTypes = [], $categories = [], $minSalary = 0, $maxSalary = 0, $datePosted = 'any', $sort = 'newest') {
     $sql = "SELECT j.*, c.company_name 
             FROM jobs j 
             JOIN companies c ON j.company_id = c.company_id 
@@ -445,10 +537,10 @@ function searchJobs($keywords = '', $location = '', $jobTypes = [], $minSalary =
     
     // Add keyword search
     if (!empty($keywords)) {
-        $sql .= " AND (j.job_title LIKE ? OR j.description LIKE ? OR j.requirements LIKE ? OR j.job_type LIKE ?)";
-        $types .= 'ssss';
+        $sql .= " AND (j.job_title LIKE ? OR j.description LIKE ? OR j.requirements LIKE ? OR j.job_type LIKE ? OR j.categories LIKE ?)";
+        $types .= 'sssss';
         $keywordParam = '%' . $keywords . '%';
-        $params = array_merge($params, [$keywordParam, $keywordParam, $keywordParam, $keywordParam]);
+        $params = array_merge($params, [$keywordParam, $keywordParam, $keywordParam, $keywordParam, $keywordParam]);
     }
     
     // Add location search
@@ -460,13 +552,25 @@ function searchJobs($keywords = '', $location = '', $jobTypes = [], $minSalary =
     
     // Filter by job types
     if (!empty($jobTypes)) {
-        $placeholders = implode(',', array_fill(0, count($jobTypes), '?'));
-        $sql .= " AND j.job_type IN ($placeholders)";
-        
+        $jobTypeConditions = [];
         foreach ($jobTypes as $type) {
+            $jobTypeConditions[] = "j.job_type = ?";
             $types .= 's';
             $params[] = $type;
         }
+        $sql .= " AND (" . implode(" OR ", $jobTypeConditions) . ")";
+    }
+    
+    // Filter by categories
+    if (!empty($categories)) {
+        $categoryConditions = [];
+        foreach ($categories as $category) {
+            // Use LIKE for matching categories in comma-separated list with spaces
+            $categoryConditions[] = "j.categories LIKE ?";
+            $types .= 's';
+            $params[] = '%' . $category . '%';
+        }
+        $sql .= " AND (" . implode(" OR ", $categoryConditions) . ")";
     }
     
     // Filter by minimum salary
@@ -476,36 +580,47 @@ function searchJobs($keywords = '', $location = '', $jobTypes = [], $minSalary =
         $params[] = $minSalary;
     }
     
+    // Filter by maximum salary
+    if (!empty($maxSalary) && $maxSalary > 0) {
+        $sql .= " AND j.salary_max <= ?";
+        $types .= 'd';
+        $params[] = $maxSalary;
+    }
+    
     // Filter by date posted
-    if ($datePosted != 'any') {
-        $date = new DateTime();
+    if ($datePosted !== 'any') {
+        $now = date('Y-m-d H:i:s');
         switch ($datePosted) {
             case 'today':
-                $date->modify('-1 day');
+                $sql .= " AND j.posted_date >= DATE_SUB(?, INTERVAL 1 DAY)";
                 break;
             case 'week':
-                $date->modify('-7 days');
+                $sql .= " AND j.posted_date >= DATE_SUB(?, INTERVAL 1 WEEK)";
                 break;
             case 'month':
-                $date->modify('-30 days');
+                $sql .= " AND j.posted_date >= DATE_SUB(?, INTERVAL 1 MONTH)";
+                break;
+            case 'three_months':
+                $sql .= " AND j.posted_date >= DATE_SUB(?, INTERVAL 3 MONTH)";
+                break;
+            case 'six_months':
+                $sql .= " AND j.posted_date >= DATE_SUB(?, INTERVAL 6 MONTH)";
                 break;
         }
-        $dateString = $date->format('Y-m-d');
-        $sql .= " AND DATE(j.posted_date) >= ?";
         $types .= 's';
-        $params[] = $dateString;
+        $params[] = $now;
     }
     
     // Add sorting
     switch ($sort) {
         case 'salary_high':
-            $sql .= " ORDER BY j.salary_max DESC, j.salary_min DESC, j.posted_date DESC";
+            $sql .= " ORDER BY j.salary_max DESC";
             break;
         case 'salary_low':
-            $sql .= " ORDER BY j.salary_min ASC, j.salary_max ASC, j.posted_date DESC";
+            $sql .= " ORDER BY j.salary_min ASC";
             break;
         case 'company':
-            $sql .= " ORDER BY c.company_name ASC, j.posted_date DESC";
+            $sql .= " ORDER BY c.company_name ASC";
             break;
         case 'newest':
         default:
@@ -594,4 +709,49 @@ function getLatestJobs($limit = 10) {
         'i', 
         [$limit]
     );
+}
+
+/**
+ * Get human-readable user type name
+ * 
+ * @param int $userType The user type ID
+ * @return string User type name
+ */
+function getUserTypeName($userType) {
+    switch ($userType) {
+        case USER_TYPE_JOBSEEKER:
+            return 'Job Seeker';
+        case USER_TYPE_COMPANY:
+            return 'Company';
+        case USER_TYPE_GOWORK:
+            return 'GoWork Staff';
+        case USER_TYPE_ADMIN:
+            return 'Admin';
+        default:
+            return 'Unknown';
+    }
+}
+
+/**
+ * Get worker id from user id
+ * 
+ * @param int $userId The user id
+ * @return int|null The worker id or null if not found
+ */
+function getWorkerId($userId) {
+    $sql = "SELECT worker_id FROM gowork_workers WHERE user_id = ?";
+    $result = fetchRow($sql, 'i', [$userId]);
+    return $result ? $result['worker_id'] : null;
+}
+
+/**
+ * Check if worker can manage users
+ * 
+ * @param int $workerId The worker id
+ * @return boolean True if worker can manage users, false otherwise
+ */
+function canWorkerManageUsers($workerId) {
+    $sql = "SELECT can_manage_users FROM gowork_workers WHERE worker_id = ?";
+    $result = fetchRow($sql, 'i', [$workerId]);
+    return $result ? (bool)$result['can_manage_users'] : false;
 }

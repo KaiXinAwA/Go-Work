@@ -2,9 +2,44 @@
  * GoWork Main CSS
  */
 
+/* Roboto Condensed Variable Font */
+.roboto-condensed-regular {
+  font-family: "Roboto Condensed", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.roboto-condensed-light {
+  font-family: "Roboto Condensed", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.roboto-condensed-bold {
+  font-family: "Roboto Condensed", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.roboto-condensed-black {
+  font-family: "Roboto Condensed", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 900;
+  font-style: normal;
+}
+
+.roboto-condensed-italic {
+  font-family: "Roboto Condensed", sans-serif;
+  font-optical-sizing: auto;
+  font-style: italic;
+}
+
 /* General Styles */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: "Roboto Condensed", sans-serif;
     line-height: 1.6;
     color: #333;
     background-color: #f8f9fa;
@@ -23,7 +58,7 @@ footer {
 
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: 1rem;
 }
 
@@ -46,25 +81,27 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: 4px;
     padding: 0.5rem 1.5rem;
     transition: all 0.3s ease;
+    font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
 .btn-primary {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
+    background-color: #000000;
+    border-color: #000000;
 }
 
 .btn-primary:hover {
-    background-color: #0b5ed7;
-    border-color: #0a58ca;
+    background-color: #000000;
+    border-color: #000000;
 }
 
 .btn-outline-primary {
-    color: #0d6efd;
-    border-color: #0d6efd;
+    color: #000000;
+    border-color: #000000;
 }
 
 .btn-outline-primary:hover {
-    background-color: #0d6efd;
+    background-color: #000000;
     color: white;
 }
 
@@ -76,8 +113,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .form-control:focus {
-    border-color: #86b7fe;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    border-color: #666666;
+    box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.25);
 }
 
 /* Alerts */
@@ -98,8 +135,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .job-title {
-    color: #0d6efd;
-    font-weight: 600;
+    color: #000000;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .company-name {
@@ -151,7 +190,7 @@ h1, h2, h3, h4, h5, h6 {
 .stat-icon {
     font-size: 2.5rem;
     margin-bottom: 1rem;
-    color: #0d6efd;
+    color: #000000;
 }
 
 .stat-value {
@@ -178,8 +217,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .custom-file-upload:hover {
-    border-color: #0d6efd;
-    background-color: #f1f8ff;
+    border-color: #000000;
+    background-color: #f1f1f1;
 }
 
 .custom-file-upload i {
@@ -213,26 +252,73 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Hero Section */
 .hero-section {
-    background-color: #0d6efd;
+    background-color: #000000;
     color: white;
-    padding: 4rem 0;
     margin-bottom: 3rem;
+    overflow: hidden;
+    width: 100%;
+}
+
+.hero-section .container-fluid {
+    width: 100%;
+}
+
+.hero-section .row {
+    align-items: stretch;
 }
 
 .hero-content {
-    max-width: 600px;
+    padding: 3rem 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 100%;
+}
+
+.hero-image-container {
+    padding: 0 !important;
+    height: auto;
+}
+
+.hero-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
 }
 
 .hero-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
+    font-family: "Roboto Condensed", sans-serif;
+    font-size: 2.2rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .hero-subtitle {
-    font-size: 1.25rem;
-    margin-bottom: 2rem;
+    font-family: "Roboto Condensed", sans-serif;
+    font-size: 1rem;
+    font-weight: 300;
+    margin-bottom: 1.5rem;
     opacity: 0.9;
+    letter-spacing: 0.5px;
+    max-width: 500px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.hero-buttons .btn {
+    padding: 0.5rem 1.2rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 /* Search Box */
@@ -265,24 +351,141 @@ h1, h2, h3, h4, h5, h6 {
     color: #dc3545;
 }
 
+/* Help Centre */
+.help-centre-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 50px;
+    padding: 12px 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.help-centre-btn:hover {
+    background-color: #0056b3;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+}
+
+.help-centre-btn i {
+    font-size: 1.2rem;
+    margin-right: 8px;
+}
+
+.help-btn-img {
+    width: auto;
+    height: 24px;
+    border-radius: 4px;
+    object-fit: contain;
+    background-color: white;
+    padding: 2px;
+    margin-right: 8px;
+}
+
 /* Navigation */
 .navbar {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-brand {
-    font-weight: 700;
-    font-size: 1.5rem;
+    font-weight: 900;
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+    color: #fff !important;
+    display: flex;
+    align-items: center;
 }
 
-/* Responsive Adjustments */
+.navbar-logo {
+    width: auto;
+    height: 45px;
+    background-color: white;
+    border-radius: 4px;
+    padding: 2px;
+}
+
+.navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* Navbar hover effect */
+.navbar-nav .nav-item .nav-link {
+    position: relative;
+    padding: 8px 15px;
+    color: #fff !important;
+}
+
+.navbar-nav .nav-item .nav-link::after {
+    content: '';
+    width: 0%;
+    height: 2px;
+    background-color: #fff;
+    display: block;
+    margin: auto;
+    transition: 0.5s;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.navbar-nav .nav-item:hover .nav-link::after {
+    width: 100%;
+}
+
+/* Dropdown menu */
+.dropdown-menu {
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border: none;
+    padding: 0.5rem 0;
+    background-color: #212529;
+}
+
+.dropdown-item {
+    color: #fff;
+    padding: 0.5rem 1.5rem;
+}
+
+.dropdown-item:hover, .dropdown-item:focus {
+    background-color: #2c3237;
+    color: #fff;
+}
+
+.dropdown-divider {
+    border-top-color: #2c3237;
+}
+
+/* Responsive adjustments for hero */
 @media (max-width: 768px) {
+    .hero-content {
+        padding: 2rem;
+    }
+    
     .hero-title {
-        font-size: 2rem;
+        font-size: 1.8rem;
     }
     
     .hero-subtitle {
-        font-size: 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .hero-buttons .btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.8rem;
     }
     
     .profile-header {
@@ -292,4 +495,11 @@ h1, h2, h3, h4, h5, h6 {
     .profile-avatar {
         margin-bottom: 1rem;
     }
+}
+
+/* Section Headings */
+section h2 {
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }

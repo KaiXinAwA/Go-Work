@@ -35,6 +35,11 @@ if ($section === 'company') {
     // Get and sanitize input
     $company_name = isset($_POST['company_name']) ? sanitizeInput($_POST['company_name']) : '';
     $description = isset($_POST['description']) ? sanitizeInput($_POST['description']) : '';
+    $contact_number = isset($_POST['contact_number']) ? sanitizeInput($_POST['contact_number']) : '';
+    $address = isset($_POST['address']) ? sanitizeInput($_POST['address']) : '';
+    $city = isset($_POST['city']) ? sanitizeInput($_POST['city']) : '';
+    $state = isset($_POST['state']) ? sanitizeInput($_POST['state']) : '';
+    $country = isset($_POST['country']) ? sanitizeInput($_POST['country']) : '';
     
     // Validate input
     if (empty($company_name) || empty($description)) {
@@ -45,7 +50,12 @@ if ($section === 'company') {
     // Update company info
     $updateData = [
         'company_name' => $company_name,
-        'description' => $description
+        'description' => $description,
+        'contact_number' => $contact_number,
+        'address' => $address,
+        'city' => $city,
+        'state' => $state,
+        'country' => $country
     ];
     
     $updateResult = updateData('companies', $updateData, 'company_id', $company['company_id']);
@@ -58,31 +68,8 @@ if ($section === 'company') {
     $_SESSION['success'] = 'Company information updated successfully';
     redirectTo(SITE_URL . '/pages/company/profile.php#company-info');
 } elseif ($section === 'contact') {
-    // Get and sanitize input
-    $contact_number = isset($_POST['contact_number']) ? sanitizeInput($_POST['contact_number']) : '';
-    $address = isset($_POST['address']) ? sanitizeInput($_POST['address']) : '';
-    $city = isset($_POST['city']) ? sanitizeInput($_POST['city']) : '';
-    $state = isset($_POST['state']) ? sanitizeInput($_POST['state']) : '';
-    $country = isset($_POST['country']) ? sanitizeInput($_POST['country']) : '';
-    
-    // Update contact info
-    $updateData = [
-        'contact_number' => $contact_number,
-        'address' => $address,
-        'city' => $city,
-        'state' => $state,
-        'country' => $country
-    ];
-    
-    $updateResult = updateData('companies', $updateData, 'company_id', $company['company_id']);
-    
-    if (!$updateResult) {
-        $_SESSION['error'] = 'Failed to update contact information';
-        redirectTo(SITE_URL . '/pages/company/profile.php#contact-info');
-    }
-    
-    $_SESSION['success'] = 'Contact information updated successfully';
-    redirectTo(SITE_URL . '/pages/company/profile.php#contact-info');
+    // This section is now merged with company info
+    redirectTo(SITE_URL . '/pages/company/profile.php#company-info');
 } else {
     // Invalid section
     $_SESSION['error'] = 'Invalid update section';

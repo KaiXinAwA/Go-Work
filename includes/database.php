@@ -37,15 +37,17 @@ function getDbConnection() {
  * @param string $sql The SQL query with placeholders
  * @param string $types The types of parameters (i: integer, s: string, d: double, b: blob)
  * @param array $params The parameters to bind to the query
- * @return mysqli_stmt|false Returns the statement object on success or false on failure
+ * @return mysqli_stmt Returns the statement object on success
+ * @throws Exception if there's an error executing the query
  */
 function executeQuery($sql, $types = '', $params = []) {
     $conn = getDbConnection();
     $stmt = $conn->prepare($sql);
     
     if ($stmt === false) {
-        error_log("Error preparing statement: " . $conn->error);
-        return false;
+        $error = "Error preparing statement: " . $conn->error;
+        error_log($error);
+        throw new Exception($error);
     }
     
     if (!empty($params)) {
@@ -59,9 +61,10 @@ function executeQuery($sql, $types = '', $params = []) {
     }
     
     if (!$stmt->execute()) {
-        error_log("Error executing statement: " . $stmt->error);
+        $error = "Error executing statement: " . $stmt->error;
+        error_log($error);
         $stmt->close();
-        return false;
+        throw new Exception($error);
     }
     
     return $stmt;
@@ -74,13 +77,10 @@ function executeQuery($sql, $types = '', $params = []) {
  * @param string $types The types of parameters
  * @param array $params The parameters to bind
  * @return array|null Returns an associative array of data or null if no rows
+ * @throws Exception if there's an error executing the query
  */
 function fetchRow($sql, $types = '', $params = []) {
     $stmt = executeQuery($sql, $types, $params);
-    
-    if ($stmt === false) {
-        return null;
-    }
     
     $result = $stmt->get_result();
     $row = $result->fetch_assoc();
@@ -96,13 +96,10 @@ function fetchRow($sql, $types = '', $params = []) {
  * @param string $types The types of parameters
  * @param array $params The parameters to bind
  * @return array Returns an array of associative arrays
+ * @throws Exception if there's an error executing the query
  */
 function fetchAll($sql, $types = '', $params = []) {
     $stmt = executeQuery($sql, $types, $params);
-    
-    if ($stmt === false) {
-        return [];
-    }
     
     $result = $stmt->get_result();
     $rows = [];
@@ -121,7 +118,8 @@ function fetchAll($sql, $types = '', $params = []) {
  * 
  * @param string $table The table name
  * @param array $data Associative array of column => value pairs
- * @return int|false Returns the last inserted ID or false on failure
+ * @return int Returns the last inserted ID
+ * @throws Exception if there's an error executing the query
  */
 function insertData($table, $data) {
     $columns = implode(', ', array_keys($data));
@@ -145,10 +143,6 @@ function insertData($table, $data) {
     $sql = "INSERT INTO $table ($columns) VALUES ($placeholders)";
     $stmt = executeQuery($sql, $types, $values);
     
-    if ($stmt === false) {
-        return false;
-    }
-    
     $id = getDbConnection()->insert_id;
     $stmt->close();
     
@@ -162,7 +156,8 @@ function insertData($table, $data) {
  * @param array $data Associative array of column => value pairs to update
  * @param string $whereCol The column to use in WHERE clause
  * @param mixed $whereVal The value to use in WHERE clause
- * @return boolean Returns true on success or false on failure
+ * @return boolean Returns true on success or false if no rows were affected
+ * @throws Exception if there's an error executing the query
  */
 function updateData($table, $data, $whereCol, $whereVal) {
     $setPart = [];
@@ -200,10 +195,6 @@ function updateData($table, $data, $whereCol, $whereVal) {
     $sql = "UPDATE $table SET " . implode(', ', $setPart) . " WHERE $whereCol = ?";
     $stmt = executeQuery($sql, $types, $values);
     
-    if ($stmt === false) {
-        return false;
-    }
-    
     $affected = $stmt->affected_rows;
     $stmt->close();
     
@@ -216,16 +207,13 @@ function updateData($table, $data, $whereCol, $whereVal) {
  * @param string $table The table name
  * @param string $whereCol The column to use in WHERE clause
  * @param mixed $whereVal The value to use in WHERE clause
- * @return boolean Returns true on success or false on failure
+ * @return boolean Returns true on success or false if no rows were affected
+ * @throws Exception if there's an error executing the query
  */
 function deleteData($table, $whereCol, $whereVal) {
     $type = is_int($whereVal) ? 'i' : (is_float($whereVal) ? 'd' : 's');
     $sql = "DELETE FROM $table WHERE $whereCol = ?";
     $stmt = executeQuery($sql, $type, [$whereVal]);
-    
-    if ($stmt === false) {
-        return false;
-    }
     
     $affected = $stmt->affected_rows;
     $stmt->close();

@@ -31,8 +31,8 @@ define('MAX_PROFILE_PIC_SIZE', 2 * 1024 * 1024); // 2MB
 
 // Email configuration for Resend
 // Comment out or replace with your actual API key if you plan to use email functionality
- define('RESEND_API_KEY', 're_2xBMehZD_6odVJUhbf6L2iPdcbVSd1nXQ');
-define('EMAIL_FROM', 'noreply@gowork.com');
+define('RESEND_API_KEY', 're_F6RnsYTZ_9ayfhsBt1qK8APH93vQfoexP');
+define('EMAIL_FROM', 'onboarding@resend.dev');  // Use Resend's verified domain
 define('EMAIL_FROM_NAME', 'GoWork');
 
 // User types

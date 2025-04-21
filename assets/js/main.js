@@ -57,6 +57,17 @@ document.addEventListener('DOMContentLoaded', function() {
             const jobId = this.dataset.jobId;
             const jobTitle = this.dataset.jobTitle;
             
+            // Check if apply button is disabled (meaning no resume)
+            const applyButton = this.querySelector('.apply-button');
+            if (applyButton && applyButton.disabled) {
+                showAlert('You must upload a resume before applying for jobs.', 'warning');
+                // Redirect to profile page after a short delay
+                setTimeout(() => {
+                    window.location.href = siteUrl + '/pages/user/profile.php';
+                }, 2000);
+                return;
+            }
+            
             // Confirm application
             if (confirm(`Are you sure you want to apply for "${jobTitle}"?`)) {
                 // Submit the form - in a real implementation, this would likely be an AJAX request

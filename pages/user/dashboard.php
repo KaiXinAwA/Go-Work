@@ -17,14 +17,28 @@ $userProfile = getUserProfile($user['user_id']);
 // Get user applications
 $applications = getApplicationsByUser($user['user_id']);
 
-// Get recommended jobs (placeholder - in a real app, you would have a recommendation algorithm)
+// Get IDs of jobs user has already applied for
+$appliedJobIds = [];
+foreach ($applications as $application) {
+    $appliedJobIds[] = $application['job_id'];
+}
+
+// Get recommended jobs (placeholder - in a real app, you would have a more sophisticated recommendation algorithm)
+// Now excludes jobs the user has already applied for
+$inClause = empty($appliedJobIds) ? "" : "AND j.job_id NOT IN (" . implode(',', array_fill(0, count($appliedJobIds), '?')) . ")";
+$params = empty($appliedJobIds) ? [] : $appliedJobIds;
+$types = empty($appliedJobIds) ? '' : str_repeat('i', count($appliedJobIds));
+
 $recommendedJobs = fetchAll(
     "SELECT j.*, c.company_name 
     FROM jobs j 
     JOIN companies c ON j.company_id = c.company_id 
     WHERE j.is_active = 1 
+    $inClause
     ORDER BY j.posted_date DESC 
-    LIMIT 3"
+    LIMIT 5",
+    $types,
+    $params
 );
 
 // Include header
@@ -221,6 +235,16 @@ require_once '../../includes/header.php';
                                             <span><?php echo timeElapsed($job['posted_date']); ?></span>
                                         </div>
                                     </div>
+                                    
+                                    <?php if (!empty($job['categories'])): ?>
+                                    <div class="mb-3">
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <?php foreach(explode(', ', html_entity_decode($job['categories'])) as $category): ?>
+                                                <span class="badge bg-light text-dark p-2"><?php echo $category; ?></span>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                    <?php endif; ?>
                                     
                                     <a href="<?php echo SITE_URL; ?>/pages/jobs.php?id=<?php echo $job['job_id']; ?>" class="btn btn-sm btn-outline-primary">View Job</a>
                                 </div>

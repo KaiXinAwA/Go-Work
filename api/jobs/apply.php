@@ -51,8 +51,35 @@ $existingApplication = fetchRow("SELECT * FROM applications WHERE job_id = ? AND
                              [$job_id, $_SESSION['user_id']]);
 
 if ($existingApplication) {
-    $_SESSION['error'] = 'You have already applied for this job';
-    redirectTo(SITE_URL . '/pages/jobs.php?id=' . $job_id);
+    // If application exists but was withdrawn, allow reapplying
+    if ($existingApplication['status'] === 'Withdrawn') {
+        // Update the existing application instead of creating a new one
+        $updateData = [
+            'status' => 'Pending',
+            'applied_date' => date('Y-m-d H:i:s'), // Reset application date
+            'resume_path' => $userProfile['resume_path']
+        ];
+        
+        $updated = updateData('applications', $updateData, 'application_id', $existingApplication['application_id']);
+        
+        if (!$updated) {
+            $_SESSION['error'] = 'Failed to reapply for this job. Please try again.';
+            redirectTo(SITE_URL . '/pages/jobs.php?id=' . $job_id);
+        }
+        
+        // Send notification email to company
+        $emailSent = sendJobApplicationNotification($job_id, $_SESSION['user_id'], $job['company_email']);
+        
+        // Set success message
+        $_SESSION['success'] = 'Your application has been resubmitted successfully!';
+        
+        // Redirect to job page
+        redirectTo(SITE_URL . '/pages/jobs.php?id=' . $job_id);
+        exit;
+    } else {
+        $_SESSION['error'] = 'You have already applied for this job';
+        redirectTo(SITE_URL . '/pages/jobs.php?id=' . $job_id);
+    }
 }
 
 // Get user profile and resume

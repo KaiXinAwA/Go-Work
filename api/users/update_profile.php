@@ -45,21 +45,22 @@ $section = isset($_POST['section']) ? sanitizeInput($_POST['section']) : '';
 if ($section === 'personal') {
     // Get and sanitize input
     $fullName = isset($_POST['full_name']) ? sanitizeInput($_POST['full_name']) : '';
+    $phone = isset($_POST['phone']) ? sanitizeInput($_POST['phone']) : '';
+    $address = isset($_POST['address']) ? sanitizeInput($_POST['address']) : '';
+    $city = isset($_POST['city']) ? sanitizeInput($_POST['city']) : '';
+    $state = isset($_POST['state']) ? sanitizeInput($_POST['state']) : '';
+    $country = isset($_POST['country']) ? sanitizeInput($_POST['country']) : '';
     
-    // Update personal info
-    $updateData = [
-        'full_name' => $fullName
-    ];
+    // Update personal and contact info using direct query
+    $sql = "UPDATE user_profiles SET full_name = ?, phone = ?, address = ?, city = ?, state = ?, country = ? WHERE user_id = ?";
+    $result = executeQuery($sql, 'ssssssi', [$fullName, $phone, $address, $city, $state, $country, $user['user_id']]);
     
-    $updateResult = updateData('user_profiles', $updateData, 'user_id', $user['user_id']);
-    
-    if (!$updateResult) {
+    if (!$result) {
         $_SESSION['error'] = 'Failed to update personal information';
-        redirectTo(SITE_URL . '/pages/user/profile.php#personal-info');
+        redirectTo(SITE_URL . '/pages/user/profile.php');
     }
     
-    $_SESSION['success'] = 'Personal information updated successfully';
-    redirectTo(SITE_URL . '/pages/user/profile.php#personal-info');
+    $_SESSION['success'] = 'Profile information updated successfully';
 } elseif ($section === 'contact') {
     // Get and sanitize input
     $phone = isset($_POST['phone']) ? sanitizeInput($_POST['phone']) : '';
@@ -68,44 +69,50 @@ if ($section === 'personal') {
     $state = isset($_POST['state']) ? sanitizeInput($_POST['state']) : '';
     $country = isset($_POST['country']) ? sanitizeInput($_POST['country']) : '';
     
-    // Update contact info
-    $updateData = [
-        'phone' => $phone,
-        'address' => $address,
-        'city' => $city,
-        'state' => $state,
-        'country' => $country
-    ];
+    // Update contact info using direct query
+    $sql = "UPDATE user_profiles SET phone = ?, address = ?, city = ?, state = ?, country = ? WHERE user_id = ?";
+    $result = executeQuery($sql, 'sssssi', [$phone, $address, $city, $state, $country, $user['user_id']]);
     
-    $updateResult = updateData('user_profiles', $updateData, 'user_id', $user['user_id']);
-    
-    if (!$updateResult) {
+    if (!$result) {
         $_SESSION['error'] = 'Failed to update contact information';
-        redirectTo(SITE_URL . '/pages/user/profile.php#contact-info');
+        redirectTo(SITE_URL . '/pages/user/profile.php');
     }
     
     $_SESSION['success'] = 'Contact information updated successfully';
-    redirectTo(SITE_URL . '/pages/user/profile.php#contact-info');
 } elseif ($section === 'education') {
     // Get and sanitize input
     $education = isset($_POST['education']) ? sanitizeInput($_POST['education']) : '';
+    $institution = isset($_POST['institution']) ? sanitizeInput($_POST['institution']) : '';
+    $completionStatus = isset($_POST['completion_status']) ? sanitizeInput($_POST['completion_status']) : '';
+    $educationHighlights = isset($_POST['education_highlights']) ? sanitizeInput($_POST['education_highlights']) : '';
     
-    // Update education info
-    $updateData = [
-        'education' => $education
-    ];
+    // Update education info using direct query
+    $sql = "UPDATE user_profiles SET education = ?, institution = ?, completion_status = ?, education_highlights = ? WHERE user_id = ?";
+    $result = executeQuery($sql, 'ssssi', [$education, $institution, $completionStatus, $educationHighlights, $user['user_id']]);
     
-    $updateResult = updateData('user_profiles', $updateData, 'user_id', $user['user_id']);
-    
-    if (!$updateResult) {
+    if (!$result) {
         $_SESSION['error'] = 'Failed to update education information';
-        redirectTo(SITE_URL . '/pages/user/profile.php#education');
+        redirectTo(SITE_URL . '/pages/user/profile.php');
     }
     
     $_SESSION['success'] = 'Education information updated successfully';
-    redirectTo(SITE_URL . '/pages/user/profile.php#education');
+} elseif ($section === 'skills') {
+    // Get and sanitize input
+    $skills = isset($_POST['skills']) ? sanitizeInput($_POST['skills']) : '';
+    
+    // Update skills info using direct query
+    $sql = "UPDATE user_profiles SET skills = ? WHERE user_id = ?";
+    $result = executeQuery($sql, 'si', [$skills, $user['user_id']]);
+    
+    if (!$result) {
+        $_SESSION['error'] = 'Failed to update skills information';
+        redirectTo(SITE_URL . '/pages/user/profile.php');
+    }
+    
+    $_SESSION['success'] = 'Skills information updated successfully';
 } else {
-    // Invalid section
-    $_SESSION['error'] = 'Invalid update section';
-    redirectTo(SITE_URL . '/pages/user/profile.php');
+    $_SESSION['error'] = 'Invalid section';
 }
+
+// Redirect back to profile page
+redirectTo(SITE_URL . '/pages/user/profile.php');

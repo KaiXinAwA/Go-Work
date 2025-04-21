@@ -64,9 +64,7 @@ require_once '../../includes/header.php';
             <!-- Profile Menu -->
             <div class="list-group mt-4">
                 <a href="#company-info" class="list-group-item list-group-item-action">Company Information</a>
-                <a href="#contact-info" class="list-group-item list-group-item-action">Contact Information</a>
                 <a href="#license" class="list-group-item list-group-item-action">License</a>
-                <a href="#password" class="list-group-item list-group-item-action">Change Password</a>
             </div>
         </div>
         
@@ -90,35 +88,7 @@ require_once '../../includes/header.php';
                             <textarea class="form-control" id="description" name="description" rows="4" required><?php echo $company && isset($company['description']) ? htmlspecialchars($company['description']) : ''; ?></textarea>
                         </div>
                         
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="username" class="form-label">Username</label>
-                                <input type="text" class="form-control" id="username" value="<?php echo htmlspecialchars($user['username']); ?>" disabled>
-                                <small class="text-muted">Username cannot be changed</small>
-                            </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Email Address</label>
-                                <input type="email" class="form-control" id="email" value="<?php echo htmlspecialchars($user['email']); ?>" disabled>
-                                <small class="text-muted">Email cannot be changed</small>
-                            </div>
-                        </div>
-                        
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">Save Changes</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            
-            <!-- Contact Information -->
-            <div class="card mb-4" id="contact-info">
-                <div class="card-header">
-                    <h5 class="mb-0">Contact Information</h5>
-                </div>
-                <div class="card-body">
-                    <form action="<?php echo SITE_URL; ?>/api/companies/update_profile.php" method="POST">
-                        <input type="hidden" name="section" value="contact">
+                        <h5 class="mt-4 mb-3">Contact Information</h5>
                         
                         <div class="mb-3">
                             <label for="contact_number" class="form-label">Contact Number</label>
@@ -131,26 +101,30 @@ require_once '../../includes/header.php';
                         </div>
                         
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label for="city" class="form-label">City</label>
                                 <input type="text" class="form-control" id="city" name="city" value="<?php echo $company && isset($company['city']) ? htmlspecialchars($company['city']) : ''; ?>">
                             </div>
                             
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label for="state" class="form-label">State/Province</label>
                                 <input type="text" class="form-control" id="state" name="state" value="<?php echo $company && isset($company['state']) ? htmlspecialchars($company['state']) : ''; ?>">
                             </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="country" class="form-label">Country</label>
-                            <input type="text" class="form-control" id="country" name="country" value="<?php echo $company && isset($company['country']) ? htmlspecialchars($company['country']) : ''; ?>">
+                            
+                            <div class="col-md-4 mb-3">
+                                <label for="country" class="form-label">Country</label>
+                                <input type="text" class="form-control" id="country" name="country" value="<?php echo $company && isset($company['country']) ? htmlspecialchars($company['country']) : ''; ?>">
+                            </div>
                         </div>
                         
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary">Save Changes</button>
                         </div>
                     </form>
+                    
+                    <div class="mt-3 text-center">
+                        <a href="../../pages/forgot_password.php">Need to change your password?</a>
+                    </div>
                 </div>
             </div>
             
@@ -223,36 +197,6 @@ require_once '../../includes/header.php';
                         
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary">Upload License</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            
-            <!-- Change Password -->
-            <div class="card mb-4" id="password">
-                <div class="card-header">
-                    <h5 class="mb-0">Change Password</h5>
-                </div>
-                <div class="card-body">
-                    <form action="<?php echo SITE_URL; ?>/api/companies/change_password.php" method="POST">
-                        <div class="mb-3">
-                            <label for="current_password" class="form-label">Current Password</label>
-                            <input type="password" class="form-control" id="current_password" name="current_password" required>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="new_password" class="form-label">New Password</label>
-                            <input type="password" class="form-control" id="new_password" name="new_password" required>
-                            <small class="text-muted">Password must be at least 8 characters long</small>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="confirm_password" class="form-label">Confirm New Password</label>
-                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
-                        </div>
-                        
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">Change Password</button>
                         </div>
                     </form>
                 </div>

@@ -55,10 +55,10 @@ require_once '../../includes/header.php';
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>">Home</a></li>
                     <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>/pages/admin/dashboard.php">Admin Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Manage Companies</li>
+                    <li class="breadcrumb-item active" aria-current="page">Manage Licenses</li>
                 </ol>
             </nav>
-            <h2>Manage Companies</h2>
+            <h2>Manage Licenses</h2>
         </div>
     </div>
     
@@ -137,9 +137,6 @@ require_once '../../includes/header.php';
                                             <td><?php echo date('M d, Y', strtotime($company['created_at'])); ?></td>
                                             <td>
                                                 <div class="btn-group" role="group">
-                                                    <a href="<?php echo SITE_URL; ?>/pages/admin/edit_company.php?id=<?php echo $company['company_id']; ?>" class="btn btn-sm btn-outline-primary" title="Edit">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
                                                     <a href="<?php echo SITE_URL; ?>/pages/admin/view_company.php?id=<?php echo $company['company_id']; ?>" class="btn btn-sm btn-outline-info" title="View">
                                                         <i class="fas fa-eye"></i>
                                                     </a>

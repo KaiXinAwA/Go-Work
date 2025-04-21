@@ -10,6 +10,11 @@ require_once $root_path . 'includes/functions.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo isset($pageTitle) ? $pageTitle . ' - ' . SITE_NAME : SITE_NAME; ?></title>
     
+    <!-- Google Fonts - Roboto Condensed -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
@@ -22,10 +27,10 @@ require_once $root_path . 'includes/functions.php';
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="<?php echo SITE_URL; ?>">
-                <?php echo SITE_NAME; ?>
+                <img src="<?php echo SITE_URL; ?>/assets/img/logo.jpg" alt="<?php echo SITE_NAME; ?>" class="navbar-logo">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -41,37 +46,56 @@ require_once $root_path . 'includes/functions.php';
                     <?php if (isLoggedIn()): ?>
                         <?php if (hasUserType(USER_TYPE_JOBSEEKER)): ?>
                             <li class="nav-item">
-                                <a class="nav-link" href="<?php echo SITE_URL; ?>/pages/user/profile.php">My Profile</a>
-                            </li>
-                            <li class="nav-item">
                                 <a class="nav-link" href="<?php echo SITE_URL; ?>/pages/user/applications.php">My Applications</a>
                             </li>
-                        <?php elseif (hasUserType(USER_TYPE_COMPANY)): ?>
                             <li class="nav-item">
-                                <a class="nav-link" href="<?php echo SITE_URL; ?>/pages/company/profile.php">Company Profile</a>
+                                <a class="nav-link" href="<?php echo SITE_URL; ?>/pages/user/dashboard.php">Dashboard</a>
                             </li>
+                        <?php elseif (hasUserType(USER_TYPE_COMPANY)): ?>
                             <li class="nav-item">
                                 <a class="nav-link" href="<?php echo SITE_URL; ?>/pages/company/post_job.php">Post Job</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="<?php echo SITE_URL; ?>/pages/company/applications.php">View Applications</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="<?php echo SITE_URL; ?>/pages/company/dashboard.php">Company Dashboard</a>
+                            </li>
                         <?php elseif (hasUserType(USER_TYPE_GOWORK)): ?>
-                            <li class="nav-item">
-                                <a class="nav-link" href="<?php echo SITE_URL; ?>/pages/gowork/dashboard.php">Dashboard</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="<?php echo SITE_URL; ?>/pages/gowork/license_review.php">License Review</a>
-                            </li>
+                            <?php 
+                            // Check if this is a GoWork worker
+                            $workerId = getWorkerId($_SESSION['user_id']);
+                            if ($workerId): 
+                            ?>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?php echo SITE_URL; ?>/pages/worker/review_license.php">License Review</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?php echo SITE_URL; ?>/pages/worker/companies.php">Companies</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?php echo SITE_URL; ?>/pages/worker/dashboard.php">Worker Dashboard</a>
+                                </li>
+                            <?php else: ?>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?php echo SITE_URL; ?>/pages/gowork/license_review.php">License Review</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?php echo SITE_URL; ?>/pages/gowork/dashboard.php">Dashboard</a>
+                                </li>
+                            <?php endif; ?>
                         <?php elseif (hasUserType(USER_TYPE_ADMIN)): ?>
                             <li class="nav-item">
+                                <a class="nav-link" href="<?php echo SITE_URL; ?>/pages/admin/users_combined.php?tab=users">Manage Users</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="<?php echo SITE_URL; ?>/pages/admin/users_combined.php?tab=staff">Manage Staff</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="<?php echo SITE_URL; ?>/pages/admin/companies.php">Manage Licenses</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link" href="<?php echo SITE_URL; ?>/pages/admin/dashboard.php">Admin Dashboard</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="<?php echo SITE_URL; ?>/pages/admin/users.php">Manage Users</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="<?php echo SITE_URL; ?>/pages/admin/companies.php">Manage Companies</a>
                             </li>
                         <?php endif; ?>
                     <?php endif; ?>
@@ -91,6 +115,7 @@ require_once $root_path . 'includes/functions.php';
                                 <?php elseif (hasUserType(USER_TYPE_COMPANY)): ?>
                                     <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>/pages/company/profile.php">Company Profile</a></li>
                                 <?php endif; ?>
+                                <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>/pages/account_settings.php">Account Settings</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>/api/auth/logout.php">Logout</a></li>
                             </ul>

@@ -14,7 +14,16 @@ if (!isLoggedIn() || !hasUserType(USER_TYPE_JOBSEEKER)) {
 $user = getCurrentUser();
 
 // Get all applications for this user
-$applications = getApplicationsByUser($user['user_id']);
+$applications = fetchAll(
+    "SELECT a.*, j.job_title, c.company_name 
+    FROM applications a 
+    JOIN jobs j ON a.job_id = j.job_id
+    JOIN companies c ON j.company_id = c.company_id
+    WHERE a.user_id = ? 
+    ORDER BY a.applied_date DESC", 
+    'i', 
+    [$user['user_id']]
+);
 
 // Include header
 require_once '../../includes/header.php';
@@ -82,6 +91,9 @@ require_once '../../includes/header.php';
                                                     case 'Rejected':
                                                         $statusClass = 'badge bg-danger';
                                                         break;
+                                                    case 'Withdrawn':
+                                                        $statusClass = 'badge bg-secondary';
+                                                        break;
                                                     default:
                                                         $statusClass = 'badge bg-secondary';
                                                 }
@@ -95,9 +107,15 @@ require_once '../../includes/header.php';
                                                     <a href="<?php echo SITE_URL; ?>/pages/jobs.php?id=<?php echo $application['job_id']; ?>" class="btn btn-sm btn-outline-primary" title="View Job">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
+                                                    <?php if ($application['status'] !== 'Withdrawn'): ?>
                                                     <button type="button" class="btn btn-sm btn-outline-danger" title="Withdraw Application" data-bs-toggle="modal" data-bs-target="#withdrawModal<?php echo $application['application_id']; ?>">
                                                         <i class="fas fa-times"></i>
                                                     </button>
+                                                    <?php else: ?>
+                                                    <a href="<?php echo SITE_URL; ?>/pages/jobs.php?id=<?php echo $application['job_id']; ?>&reapply=1" class="btn btn-sm btn-outline-success" title="Reapply">
+                                                        <i class="fas fa-redo-alt"></i>
+                                                    </a>
+                                                    <?php endif; ?>
                                                 </div>
                                                 
                                                 <!-- Withdraw Modal -->
@@ -166,6 +184,12 @@ require_once '../../includes/header.php';
                                 <span>Your application was not selected for this position.</span>
                             </div>
                         </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-secondary me-2">Withdrawn</span>
+                                <span>You have withdrawn your application from consideration.</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -177,3 +201,75 @@ require_once '../../includes/header.php';
 // Include footer
 require_once '../../includes/footer.php';
 ?>
+
+<script>
+// Add filter and search functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Add filter controls above the table
+    const tableResponsive = document.querySelector('.table-responsive');
+    if (tableResponsive) {
+        const filterControls = document.createElement('div');
+        filterControls.className = 'row mb-3';
+        filterControls.innerHTML = `
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control" placeholder="Search jobs..." id="searchApplications">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex justify-content-md-end">
+                    <select class="form-select w-auto" id="filterStatus">
+                        <option value="">All Statuses</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Viewed">Viewed</option>
+                        <option value="Shortlisted">Shortlisted</option>
+                        <option value="Rejected">Rejected</option>
+                        <option value="Withdrawn">Withdrawn</option>
+                    </select>
+                </div>
+            </div>
+        `;
+        
+        tableResponsive.parentNode.insertBefore(filterControls, tableResponsive);
+        
+        // Add filtering functionality
+        const searchInput = document.getElementById('searchApplications');
+        const statusFilter = document.getElementById('filterStatus');
+        const applicationRows = document.querySelectorAll('table tbody tr');
+        
+        function filterApplications() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const statusValue = statusFilter.value;
+            
+            applicationRows.forEach(row => {
+                // Get job title and company for search
+                const jobTitle = row.querySelector('td:first-child').textContent.toLowerCase();
+                const company = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                
+                // Get status value
+                const statusElement = row.querySelector('td .badge');
+                const statusText = statusElement ? statusElement.textContent.trim() : '';
+                
+                // Check if row matches both filters
+                const matchesSearch = searchTerm === '' || 
+                                     jobTitle.includes(searchTerm) || 
+                                     company.includes(searchTerm);
+                const matchesStatus = statusValue === '' || statusText === statusValue;
+                
+                // Show/hide row based on filters
+                row.style.display = matchesSearch && matchesStatus ? '' : 'none';
+            });
+        }
+        
+        // Add event listeners
+        if (searchInput) {
+            searchInput.addEventListener('input', filterApplications);
+        }
+        
+        if (statusFilter) {
+            statusFilter.addEventListener('change', filterApplications);
+        }
+    }
+});
+</script>

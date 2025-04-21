@@ -22,7 +22,7 @@ $application_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $status = isset($_GET['status']) ? sanitizeInput($_GET['status']) : '';
 
 // Validate application ID and status
-if ($application_id <= 0 || !in_array($status, ['Pending', 'Viewed', 'Shortlisted', 'Rejected'])) {
+if ($application_id <= 0 || !in_array($status, ['Pending', 'Viewed', 'Shortlisted', 'Rejected', 'Withdrawn'])) {
     $_SESSION['error'] = 'Invalid parameters';
     redirectTo(SITE_URL . '/pages/company/applications.php');
 }

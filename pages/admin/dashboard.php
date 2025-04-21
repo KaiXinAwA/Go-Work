@@ -170,7 +170,7 @@ require_once '../../includes/header.php';
                     <?php endif; ?>
                 </div>
                 <div class="card-footer">
-                    <a href="<?php echo SITE_URL; ?>/pages/admin/users.php" class="btn btn-sm btn-outline-primary">View All Users</a>
+                    <a href="<?php echo SITE_URL; ?>/pages/admin/users_combined.php?tab=users" class="btn btn-sm btn-outline-primary">View All Users</a>
                 </div>
             </div>
         </div>
@@ -214,48 +214,6 @@ require_once '../../includes/header.php';
                             No pending license approvals.
                         </div>
                     <?php endif; ?>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="row">
-        <!-- Quick Actions -->
-        <div class="col-12 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Quick Actions</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <a href="<?php echo SITE_URL; ?>/pages/admin/users.php" class="btn btn-primary w-100 py-3">
-                                <i class="fas fa-users mb-2 d-block fa-2x"></i>
-                                Manage Users
-                            </a>
-                        </div>
-                        
-                        <div class="col-md-3 mb-3">
-                            <a href="<?php echo SITE_URL; ?>/pages/admin/companies.php" class="btn btn-success w-100 py-3">
-                                <i class="fas fa-building mb-2 d-block fa-2x"></i>
-                                Manage Companies
-                            </a>
-                        </div>
-                        
-                        <div class="col-md-3 mb-3">
-                            <a href="<?php echo SITE_URL; ?>/pages/admin/review_license.php" class="btn btn-info w-100 py-3">
-                                <i class="fas fa-file-contract mb-2 d-block fa-2x"></i>
-                                Review Licenses
-                            </a>
-                        </div>
-                        
-                        <div class="col-md-3 mb-3">
-                            <a href="<?php echo SITE_URL; ?>/pages/admin/settings.php" class="btn btn-secondary w-100 py-3">
-                                <i class="fas fa-cog mb-2 d-block fa-2x"></i>
-                                Site Settings
-                            </a>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

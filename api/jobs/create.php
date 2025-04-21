@@ -42,6 +42,7 @@ $salary_max = isset($_POST['salary_max']) && is_numeric($_POST['salary_max']) ? 
 $description = isset($_POST['description']) ? sanitizeInput($_POST['description']) : '';
 $requirements = isset($_POST['requirements']) ? sanitizeInput($_POST['requirements']) : '';
 $is_active = isset($_POST['is_active']) ? 1 : 0;
+$categories = isset($_POST['category_string']) ? html_entity_decode(sanitizeInput($_POST['category_string'])) : '';
 
 // Validate required fields
 if (empty($job_title) || empty($job_type) || empty($location) || empty($description) || empty($requirements)) {
@@ -54,6 +55,7 @@ $jobData = [
     'company_id' => $company['company_id'],
     'job_title' => $job_title,
     'job_type' => $job_type,
+    'categories' => $categories,
     'location' => $location,
     'description' => $description,
     'requirements' => $requirements,

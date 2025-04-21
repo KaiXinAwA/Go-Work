@@ -14,47 +14,24 @@ require_once $root_path . 'includes/header.php';
 
 <!-- Hero Section -->
 <section class="hero-section">
-    <div class="container">
-        <div class="row align-items-center">
+    <div class="container-fluid px-0">
+        <div class="row align-items-stretch g-0">
             <div class="col-md-6 hero-content">
                 <h1 class="hero-title">Find Your Dream Job Today</h1>
                 <p class="hero-subtitle">Connect with top employers and discover career opportunities that match your skills and aspirations.</p>
-                <a href="<?php echo SITE_URL; ?>/pages/jobs.php" class="btn btn-light btn-lg">Browse Jobs</a>
-                <?php if (!isLoggedIn()): ?>
-                    <a href="<?php echo SITE_URL; ?>/pages/register.php" class="btn btn-outline-light btn-lg ms-2">Sign Up</a>
-                <?php endif; ?>
+                <div class="hero-buttons">
+                    <a href="<?php echo SITE_URL; ?>/pages/jobs.php" class="btn btn-light">Browse Jobs</a>
+                    <?php if (!isLoggedIn()): ?>
+                        <a href="<?php echo SITE_URL; ?>/pages/register.php" class="btn btn-outline-light ms-2">Sign Up</a>
+                    <?php endif; ?>
+                </div>
             </div>
-            <div class="col-md-6 d-none d-md-block">
-                <img src="<?php echo SITE_URL; ?>/assets/img/hero-image.svg" alt="Job Search" class="img-fluid">
+            <div class="col-md-6 d-md-block hero-image-container">
+                <img src="<?php echo SITE_URL; ?>/assets/img/jobb.jpg" alt="Job Search" class="img-fluid">
             </div>
         </div>
     </div>
 </section>
-
-<!-- Search Box -->
-<div class="container">
-    <div class="search-box">
-        <form action="<?php echo SITE_URL; ?>/pages/jobs.php" method="GET" id="job-search-form">
-            <div class="row g-3">
-                <div class="col-md-5">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-search"></i></span>
-                        <input type="text" class="form-control" name="keywords" id="keywords" placeholder="Job title, keywords, or company">
-                    </div>
-                </div>
-                <div class="col-md-5">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
-                        <input type="text" class="form-control" name="location" id="location" placeholder="City, state, or zip code">
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">Search</button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
 
 <!-- Latest Jobs Section -->
 <section class="container">
