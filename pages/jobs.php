@@ -41,30 +41,13 @@ $customCSS = '
 
 // Get search parameters
 $keywords = isset($_GET['keywords']) ? sanitizeInput($_GET['keywords']) : '';
-<<<<<<< HEAD
 $jobTypes = isset($_GET['job_type']) ? $_GET['job_type'] : [];
 $categories = isset($_GET['categories']) ? $_GET['categories'] : [];
 $minSalary = isset($_GET['min_salary']) ? (int)$_GET['min_salary'] : 0;
 $maxSalary = isset($_GET['max_salary']) ? (int)$_GET['max_salary'] : 0;
-=======
-$location = isset($_GET['location']) ? sanitizeInput($_GET['location']) : '';
-$workClassifications = isset($_GET['work_classification']) ? $_GET['work_classification'] : [];
-$workTypes = isset($_GET['work_type']) ? $_GET['work_type'] : [];
-$locationIds = isset($_GET['location_id']) ? $_GET['location_id'] : [];
-$skills = isset($_GET['skills']) ? $_GET['skills'] : [];
->>>>>>> e0d46ca899b7b3f520e94d60c6a043af5d9b4fe4
 $datePosted = isset($_GET['date_posted']) ? sanitizeInput($_GET['date_posted']) : 'any';
 $sort = isset($_GET['sort']) ? sanitizeInput($_GET['sort']) : 'newest';
-
-// 处理薪资范围
-$salaryMin = null;
-$salaryMax = null;
-if (isset($_GET['salary_min']) && !empty($_GET['salary_min'])) {
-    $salaryMin = (float)$_GET['salary_min'];
-}
-if (isset($_GET['salary_max']) && !empty($_GET['salary_max'])) {
-    $salaryMax = (float)$_GET['salary_max'];
-}
+$location = isset($_GET['location']) ? sanitizeInput($_GET['location']) : '';
 
 // Set up error logging
 ini_set('display_errors', 1);
@@ -77,24 +60,16 @@ $job_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if ($job_id > 0) {
     // Get single job details
     $job = fetchRow(
-        "SELECT j.*, c.company_name, c.description as company_description, 
-                wc.name as classification_name, wt.name as work_type_name, l.name as location_name 
-         FROM jobs j 
-         JOIN companies c ON j.company_id = c.company_id 
-         LEFT JOIN work_classifications wc ON j.work_classification_id = wc.classification_id
-         LEFT JOIN work_types wt ON j.work_type_id = wt.type_id
-         LEFT JOIN locations l ON j.location_id = l.location_id
-         WHERE j.job_id = ? AND j.is_active = 1", 
+        "SELECT j.*, c.company_name, c.description as company_description 
+        FROM jobs j 
+        JOIN companies c ON j.company_id = c.company_id 
+        WHERE j.job_id = ? AND j.is_active = 1", 
         'i', 
         [$job_id]
     );
 } else {
     // Search for jobs with filters
-<<<<<<< HEAD
     $jobs = searchJobs($keywords, $location, $jobTypes, $categories, $minSalary, $maxSalary, $datePosted, $sort);
-=======
-    $jobs = searchJobs($keywords, $location, $workClassifications, $workTypes, $salaryMin, $salaryMax, $skills, $datePosted, $sort);
->>>>>>> e0d46ca899b7b3f520e94d60c6a043af5d9b4fe4
 }
 
 // Include header
@@ -302,106 +277,6 @@ require_once '../includes/header.php';
                         <button type="submit" class="btn btn-primary w-100">Search</button>
                     </div>
                 </div>
-                
-                <!-- Job Query Toggle Button -->
-                <div class="text-end mt-2">
-                    <button type="button" class="btn btn-link" id="toggleJobQuery">
-                        <i class="fas fa-chevron-down"></i> Job Query
-                    </button>
-                </div>
-                
-                <!-- Job Query -->
-                <div class="job-query mt-3" id="jobQuery" style="display: none;">
-                    <div class="row g-3">
-                        <!-- Work Classification -->
-                        <div class="col-md-6">
-                            <label class="form-label">Work Classification</label>
-                            <select class="form-select" name="work_classification[]" multiple>
-                                <?php
-                                $classifications = fetchAll("SELECT * FROM work_classifications ORDER BY name");
-                                $selectedClassifications = isset($_GET['work_classification']) ? $_GET['work_classification'] : [];
-                                foreach ($classifications as $classification):
-                                    $selected = in_array($classification['classification_id'], $selectedClassifications) ? 'selected' : '';
-                                ?>
-                                    <option value="<?php echo $classification['classification_id']; ?>" <?php echo $selected; ?>>
-                                        <?php echo htmlspecialchars($classification['name']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
-                        <!-- Work Type -->
-                        <div class="col-md-6">
-                            <label class="form-label">Work Type</label>
-                            <select class="form-select" name="work_type[]" multiple>
-                                <?php
-                                $workTypes = fetchAll("SELECT * FROM work_types ORDER BY name");
-                                $selectedTypes = isset($_GET['work_type']) ? $_GET['work_type'] : [];
-                                foreach ($workTypes as $type):
-                                    $selected = in_array($type['type_id'], $selectedTypes) ? 'selected' : '';
-                                ?>
-                                    <option value="<?php echo $type['type_id']; ?>" <?php echo $selected; ?>>
-                                        <?php echo htmlspecialchars($type['name']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
-                        <!-- Salary Range -->
-                        <div class="col-md-6">
-                            <label class="form-label">Salary Range</label>
-                            <select class="form-select" name="salary_range[]" multiple>
-                                <option value="1700-2700" <?php echo (isset($_GET['salary_range']) && in_array('1700-2700', $_GET['salary_range'])) ? 'selected' : ''; ?>>1700-2700</option>
-                                <option value="2700-3700" <?php echo (isset($_GET['salary_range']) && in_array('2700-3700', $_GET['salary_range'])) ? 'selected' : ''; ?>>2700-3700</option>
-                                <option value="3700-5000" <?php echo (isset($_GET['salary_range']) && in_array('3700-5000', $_GET['salary_range'])) ? 'selected' : ''; ?>>3700-5000</option>
-                                <option value="5000-7000" <?php echo (isset($_GET['salary_range']) && in_array('5000-7000', $_GET['salary_range'])) ? 'selected' : ''; ?>>5000-7000</option>
-                                <option value="7000-9000" <?php echo (isset($_GET['salary_range']) && in_array('7000-9000', $_GET['salary_range'])) ? 'selected' : ''; ?>>7000-9000</option>
-                                <option value="9000-above" <?php echo (isset($_GET['salary_range']) && in_array('9000-above', $_GET['salary_range'])) ? 'selected' : ''; ?>>9000 above</option>
-                            </select>
-                        </div>
-
-                        <!-- Location -->
-                        <div class="col-md-6">
-                            <label class="form-label">Location</label>
-                            <select class="form-select" name="location_id[]" multiple>
-                                <?php
-                                $locations = fetchAll("SELECT * FROM locations ORDER BY name");
-                                $selectedLocations = isset($_GET['location_id']) ? $_GET['location_id'] : [];
-                                foreach ($locations as $loc):
-                                    $selected = in_array($loc['location_id'], $selectedLocations) ? 'selected' : '';
-                                ?>
-                                    <option value="<?php echo $loc['location_id']; ?>" <?php echo $selected; ?>>
-                                        <?php echo htmlspecialchars($loc['name']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
-                        <!-- Skills -->
-                        <div class="col-md-12">
-                            <label class="form-label">Required Skills</label>
-                            <select class="form-select" name="skills[]" multiple>
-                                <?php
-                                $skills = fetchAll("SELECT * FROM skills ORDER BY category, name");
-                                $selectedSkills = isset($_GET['skills']) ? $_GET['skills'] : [];
-                                $currentCategory = '';
-                                foreach ($skills as $skill):
-                                    if ($currentCategory != $skill['category']):
-                                        if ($currentCategory != '') echo '</optgroup>';
-                                        echo '<optgroup label="' . htmlspecialchars($skill['category']) . '">';
-                                        $currentCategory = $skill['category'];
-                                    endif;
-                                    $selected = in_array($skill['skill_id'], $selectedSkills) ? 'selected' : '';
-                                ?>
-                                    <option value="<?php echo $skill['skill_id']; ?>" <?php echo $selected; ?>>
-                                        <?php echo htmlspecialchars($skill['name']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                                </optgroup>
-                            </select>
-                        </div>
-                    </div>
-                </div>
             </form>
         </div>
         
@@ -421,7 +296,6 @@ require_once '../includes/header.php';
                             
                             <h6>Job Type</h6>
                             <div class="mb-3">
-<<<<<<< HEAD
                                 <div class="accordion" id="jobTypeAccordion">
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">
@@ -937,28 +811,11 @@ require_once '../includes/header.php';
                                             </div>
                                         </div>
                                     </div>
-=======
-                                <?php 
-                                $selectedTypes = isset($_GET['work_type']) ? $_GET['work_type'] : []; 
-                                $workTypes = fetchAll("SELECT * FROM work_types ORDER BY name");
-                                foreach ($workTypes as $type):
-                                    $typeId = strtolower(str_replace(' ', '-', $type['name']));
-                                    $checked = in_array($type['type_id'], $selectedTypes) ? 'checked' : '';
-                                ?>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="work_type[]" 
-                                           value="<?php echo $type['type_id']; ?>" 
-                                           id="type-<?php echo $typeId; ?>" <?php echo $checked; ?>>
-                                    <label class="form-check-label" for="type-<?php echo $typeId; ?>">
-                                        <?php echo htmlspecialchars($type['name']); ?>
-                                    </label>
->>>>>>> e0d46ca899b7b3f520e94d60c6a043af5d9b4fe4
                                 </div>
                             </div>
                             
                             <h6>Salary Range</h6>
                             <div class="mb-3">
-<<<<<<< HEAD
                                 <div class="row g-2">
                                     <div class="col-6">
                                         <label for="min_salary" class="form-label small">From (RM)</label>
@@ -973,15 +830,6 @@ require_once '../includes/header.php';
                                                value="<?php echo isset($_GET['max_salary']) ? htmlspecialchars($_GET['max_salary']) : ''; ?>">
                                     </div>
                                 </div>
-=======
-                                <select class="form-select" name="salary_min">
-                                    <option value="">Any Salary</option>
-                                    <option value="30000" <?php echo (isset($_GET['salary_min']) && $_GET['salary_min'] == '30000') ? 'selected' : ''; ?>>$30,000+</option>
-                                    <option value="50000" <?php echo (isset($_GET['salary_min']) && $_GET['salary_min'] == '50000') ? 'selected' : ''; ?>>$50,000+</option>
-                                    <option value="70000" <?php echo (isset($_GET['salary_min']) && $_GET['salary_min'] == '70000') ? 'selected' : ''; ?>>$70,000+</option>
-                                    <option value="100000" <?php echo (isset($_GET['salary_min']) && $_GET['salary_min'] == '100000') ? 'selected' : ''; ?>>$100,000+</option>
-                                </select>
->>>>>>> e0d46ca899b7b3f520e94d60c6a043af5d9b4fe4
                             </div>
                             
                             <h6>Date Posted</h6>
@@ -1001,13 +849,8 @@ require_once '../includes/header.php';
                             
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-outline-primary">Apply Filters</button>
-<<<<<<< HEAD
                                 <?php if(!empty($jobTypes) || !empty($categories) || !empty($minSalary) || !empty($maxSalary) || $datePosted != 'any'): ?>
                                     <button type="button" class="btn btn-outline-dark mt-2" id="clear-filters">Clear Filters</button>
-=======
-                                <?php if(!empty($workClassifications) || !empty($workTypes) || !empty($salaryMin) || !empty($salaryMax) || !empty($skills) || $datePosted != 'any'): ?>
-                                    <button type="button" class="btn btn-outline-secondary mt-2" id="clear-filters">Clear Filters</button>
->>>>>>> e0d46ca899b7b3f520e94d60c6a043af5d9b4fe4
                                 <?php endif; ?>
                             </div>
                         </form>
@@ -1104,7 +947,7 @@ require_once '../includes/header.php';
                                             </div>
                                             <div class="job-detail">
                                                 <i class="fas fa-briefcase"></i>
-                                                <span><?php echo htmlspecialchars($job['work_type_name']); ?></span>
+                                                <span><?php echo htmlspecialchars($job['job_type']); ?></span>
                                             </div>
                                             <div class="job-detail">
                                                 <i class="fas fa-money-bill-wave"></i>

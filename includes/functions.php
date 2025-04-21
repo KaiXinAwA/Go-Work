@@ -515,7 +515,6 @@ function getApplicationsByUser($userId) {
 }
 
 /**
-<<<<<<< HEAD
  * Search jobs by keywords, location, and additional filters
  * 
  * @param string $keywords Keywords to search for
@@ -534,42 +533,23 @@ function searchJobs($keywords = '', $location = '', $jobTypes = [], $categories 
             JOIN companies c ON j.company_id = c.company_id 
             WHERE j.is_active = 1";
     $types = '';
-=======
- * 高级职位搜索函数
- */
-function searchJobs($keywords, $location, $workClassifications = [], $workTypes = [], $salaryMin = null, $salaryMax = null, $skills = [], $datePosted = 'any', $sort = 'newest') {
->>>>>>> e0d46ca899b7b3f520e94d60c6a043af5d9b4fe4
     $params = [];
-    $types = '';
-    $conditions = ['j.is_active = 1'];
     
-    // 关键词搜索
+    // Add keyword search
     if (!empty($keywords)) {
-<<<<<<< HEAD
         $sql .= " AND (j.job_title LIKE ? OR j.description LIKE ? OR j.requirements LIKE ? OR j.job_type LIKE ? OR j.categories LIKE ?)";
         $types .= 'sssss';
         $keywordParam = '%' . $keywords . '%';
         $params = array_merge($params, [$keywordParam, $keywordParam, $keywordParam, $keywordParam, $keywordParam]);
-=======
-        $conditions[] = "(j.job_title LIKE ? OR j.description LIKE ? OR c.company_name LIKE ?)";
-        $keyword = "%$keywords%";
-        $params[] = $keyword;
-        $params[] = $keyword;
-        $params[] = $keyword;
-        $types .= 'sss';
->>>>>>> e0d46ca899b7b3f520e94d60c6a043af5d9b4fe4
     }
     
-    // 地点搜索
+    // Add location search
     if (!empty($location)) {
-        $conditions[] = "(l.name LIKE ? OR l.region LIKE ?)";
-        $locationParam = "%$location%";
-        $params[] = $locationParam;
-        $params[] = $locationParam;
-        $types .= 'ss';
+        $sql .= " AND j.location LIKE ?";
+        $types .= 's';
+        $params[] = '%' . $location . '%';
     }
     
-<<<<<<< HEAD
     // Filter by job types
     if (!empty($jobTypes)) {
         $jobTypeConditions = [];
@@ -591,37 +571,15 @@ function searchJobs($keywords, $location, $workClassifications = [], $workTypes 
             $params[] = '%' . $category . '%';
         }
         $sql .= " AND (" . implode(" OR ", $categoryConditions) . ")";
-=======
-    // 工作分类过滤
-    if (!empty($workClassifications)) {
-        $placeholders = str_repeat('?,', count($workClassifications) - 1) . '?';
-        $conditions[] = "j.work_classification_id IN ($placeholders)";
-        $params = array_merge($params, $workClassifications);
-        $types .= str_repeat('i', count($workClassifications));
->>>>>>> e0d46ca899b7b3f520e94d60c6a043af5d9b4fe4
     }
     
-    // 工作类型过滤
-    if (!empty($workTypes)) {
-        $placeholders = str_repeat('?,', count($workTypes) - 1) . '?';
-        $conditions[] = "j.work_type_id IN ($placeholders)";
-        $params = array_merge($params, $workTypes);
-        $types .= str_repeat('i', count($workTypes));
-    }
-    
-    // 薪资范围过滤
-    if ($salaryMin !== null) {
-        $conditions[] = "j.salary_max >= ?";
-        $params[] = $salaryMin;
+    // Filter by minimum salary
+    if (!empty($minSalary) && $minSalary > 0) {
+        $sql .= " AND j.salary_min >= ?";
         $types .= 'd';
-    }
-    if ($salaryMax !== null) {
-        $conditions[] = "j.salary_min <= ?";
-        $params[] = $salaryMax;
-        $types .= 'd';
+        $params[] = $minSalary;
     }
     
-<<<<<<< HEAD
     // Filter by maximum salary
     if (!empty($maxSalary) && $maxSalary > 0) {
         $sql .= " AND j.salary_max <= ?";
@@ -651,45 +609,9 @@ function searchJobs($keywords, $location, $workClassifications = [], $workTypes 
         }
         $types .= 's';
         $params[] = $now;
-=======
-    // 技能要求过滤
-    if (!empty($skills)) {
-        $placeholders = str_repeat('?,', count($skills) - 1) . '?';
-        $conditions[] = "EXISTS (
-            SELECT 1 FROM job_skills js 
-            WHERE js.job_id = j.job_id 
-            AND js.skill_id IN ($placeholders)
-        )";
-        $params = array_merge($params, $skills);
-        $types .= str_repeat('i', count($skills));
     }
     
-    // 发布日期过滤
-    if ($datePosted != 'any') {
-        switch ($datePosted) {
-            case 'today':
-                $conditions[] = "DATE(j.posted_date) = CURDATE()";
-                break;
-            case 'week':
-                $conditions[] = "j.posted_date >= DATE_SUB(NOW(), INTERVAL 1 WEEK)";
-                break;
-            case 'month':
-                $conditions[] = "j.posted_date >= DATE_SUB(NOW(), INTERVAL 1 MONTH)";
-                break;
-        }
->>>>>>> e0d46ca899b7b3f520e94d60c6a043af5d9b4fe4
-    }
-    
-    // 构建SQL查询
-    $sql = "SELECT DISTINCT j.*, c.company_name, wc.name as classification_name, wt.name as work_type_name, l.name as location_name 
-            FROM jobs j 
-            JOIN companies c ON j.company_id = c.company_id 
-            LEFT JOIN work_classifications wc ON j.work_classification_id = wc.classification_id
-            LEFT JOIN work_types wt ON j.work_type_id = wt.type_id
-            LEFT JOIN locations l ON j.location_id = l.location_id
-            WHERE " . implode(' AND ', $conditions);
-    
-    // 排序
+    // Add sorting
     switch ($sort) {
         case 'salary_high':
             $sql .= " ORDER BY j.salary_max DESC";
@@ -697,16 +619,13 @@ function searchJobs($keywords, $location, $workClassifications = [], $workTypes 
         case 'salary_low':
             $sql .= " ORDER BY j.salary_min ASC";
             break;
-<<<<<<< HEAD
         case 'company':
             $sql .= " ORDER BY c.company_name ASC";
-=======
-        case 'oldest':
-            $sql .= " ORDER BY j.posted_date ASC";
->>>>>>> e0d46ca899b7b3f520e94d60c6a043af5d9b4fe4
             break;
-        default: // newest
+        case 'newest':
+        default:
             $sql .= " ORDER BY j.posted_date DESC";
+            break;
     }
     
     return fetchAll($sql, $types, $params);
