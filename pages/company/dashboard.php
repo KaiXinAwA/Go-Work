@@ -48,11 +48,6 @@ require_once '../../includes/header.php';
                     <a href="<?php echo SITE_URL; ?>/pages/company/profile.php" class="btn btn-outline-primary me-2">
                         <i class="fas fa-building"></i> Company Profile
                     </a>
-                    <?php if ($company && $company['license_status'] === 'Approved'): ?>
-                        <a href="<?php echo SITE_URL; ?>/pages/company/post_job.php" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Post New Job
-                        </a>
-                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -140,31 +135,6 @@ require_once '../../includes/header.php';
                             </h5>
                             <small>Total Applications</small>
                         </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Quick Links -->
-            <div class="card mt-4">
-                <div class="card-header">
-                    Quick Links
-                </div>
-                <div class="card-body">
-                    <div class="list-group">
-                        <a href="<?php echo SITE_URL; ?>/pages/company/profile.php" class="list-group-item list-group-item-action">
-                            <i class="fas fa-building me-2"></i> Edit Company Profile
-                        </a>
-                        <a href="<?php echo SITE_URL; ?>/pages/company/jobs.php" class="list-group-item list-group-item-action">
-                            <i class="fas fa-briefcase me-2"></i> Manage Jobs
-                        </a>
-                        <a href="<?php echo SITE_URL; ?>/pages/company/applications.php" class="list-group-item list-group-item-action">
-                            <i class="fas fa-users me-2"></i> View Applications
-                        </a>
-                        <?php if ($company && $company['license_status'] === 'Approved'): ?>
-                            <a href="<?php echo SITE_URL; ?>/pages/company/post_job.php" class="list-group-item list-group-item-action">
-                                <i class="fas fa-plus-circle me-2"></i> Post New Job
-                            </a>
-                        <?php endif; ?>
                     </div>
                 </div>
             </div>

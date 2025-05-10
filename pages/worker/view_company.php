@@ -20,15 +20,15 @@ if (!$workerId) {
 // Get company ID
 $companyId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-// Check if ID is provided
+// Check if company exists
 if ($companyId === 0) {
-    $_SESSION['error'] = 'No company ID provided';
+    $_SESSION['error'] = 'Invalid company ID';
     redirectTo(SITE_URL . '/pages/worker/companies.php');
 }
 
-// Get company data
+// Get company information
 $company = fetchRow(
-    "SELECT c.*, u.email, u.username, u.created_at as user_created_at, u.profile_picture
+    "SELECT c.*, u.email, u.username, u.created_at as user_created_at
      FROM companies c 
      JOIN users u ON c.user_id = u.user_id 
      WHERE c.company_id = ?", 
@@ -36,14 +36,17 @@ $company = fetchRow(
     [$companyId]
 );
 
-// Check if company exists
 if (!$company) {
     $_SESSION['error'] = 'Company not found';
     redirectTo(SITE_URL . '/pages/worker/companies.php');
 }
 
-// Get jobs by company
-$jobs = getJobsByCompany($companyId);
+// Get company's job listings
+$jobs = fetchAll(
+    "SELECT * FROM jobs WHERE company_id = ? ORDER BY posted_date DESC", 
+    'i', 
+    [$companyId]
+);
 
 // Include header
 require_once '../../includes/header.php';
@@ -60,7 +63,7 @@ require_once '../../includes/header.php';
                     <li class="breadcrumb-item active" aria-current="page"><?php echo htmlspecialchars($company['company_name']); ?></li>
                 </ol>
             </nav>
-            <h2>Company: <?php echo htmlspecialchars($company['company_name']); ?></h2>
+            <h2><?php echo htmlspecialchars($company['company_name']); ?></h2>
         </div>
     </div>
     
@@ -71,18 +74,13 @@ require_once '../../includes/header.php';
                     <h5 class="mb-0">Company Profile</h5>
                 </div>
                 <div class="card-body">
-                    <?php if (!empty($company['profile_picture'])): ?>
-                        <div class="text-center mb-3">
-                            <img src="<?php echo SITE_URL; ?>/uploads/profile_pictures/<?php echo $company['profile_picture']; ?>" class="img-fluid rounded" style="max-width: 150px; max-height: 150px;" alt="Profile Picture">
-                        </div>
-                    <?php endif; ?>
+                    <div class="text-center mb-3">
+                        <img src="<?php echo SITE_URL; ?>/assets/img/company-placeholder.png" alt="<?php echo htmlspecialchars($company['company_name']); ?>" class="img-fluid rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
+                    </div>
                     
                     <dl>
                         <dt>Company Name</dt>
                         <dd><?php echo htmlspecialchars($company['company_name']); ?></dd>
-                        
-                        <dt>Description</dt>
-                        <dd><?php echo isset($company['description']) && $company['description'] ? nl2br(htmlspecialchars($company['description'])) : 'Not provided'; ?></dd>
                         
                         <dt>Email</dt>
                         <dd><?php echo htmlspecialchars($company['email']); ?></dd>
@@ -129,24 +127,36 @@ require_once '../../includes/header.php';
                             <span class="badge <?php echo $statusClass; ?>"><?php echo $company['license_status']; ?></span>
                         </dd>
                     </dl>
-                </div>
-                <div class="card-footer">
-                    <?php if ($company['license_status'] === 'Pending'): ?>
-                        <a href="<?php echo SITE_URL; ?>/pages/worker/review_license.php?id=<?php echo $companyId; ?>" class="btn btn-warning">
-                            <i class="fas fa-file-contract"></i> Review License
-                        </a>
-                    <?php endif; ?>
-                    <a href="<?php echo SITE_URL; ?>/pages/worker/companies.php" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left"></i> Back to Companies
-                    </a>
+                    
+                    <div class="d-grid gap-2 mt-3">
+                        <?php if ($company['license_path']): ?>
+                            <a href="<?php echo SITE_URL; ?>/pages/worker/review_license.php?id=<?php echo $companyId; ?>" class="btn btn-primary">
+                                <i class="fas fa-file-contract"></i> Review License
+                            </a>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
         </div>
         
-        <div class="col-md-8 mb-4">
-            <div class="card">
+        <div class="col-md-8">
+            <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="mb-0">Company Jobs</h5>
+                    <h5 class="mb-0">Company Description</h5>
+                </div>
+                <div class="card-body">
+                    <?php if (isset($company['description']) && $company['description']): ?>
+                        <p><?php echo nl2br(htmlspecialchars($company['description'])); ?></p>
+                    <?php else: ?>
+                        <p class="text-muted">No company description provided.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Job Listings</h5>
+                    <span class="badge bg-primary"><?php echo count($jobs); ?> Jobs</span>
                 </div>
                 <div class="card-body">
                     <?php if (!empty($jobs)): ?>
@@ -154,10 +164,9 @@ require_once '../../includes/header.php';
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Job Title</th>
+                                        <th>Title</th>
                                         <th>Type</th>
                                         <th>Location</th>
-                                        <th>Salary</th>
                                         <th>Posted</th>
                                         <th>Status</th>
                                     </tr>
@@ -165,21 +174,14 @@ require_once '../../includes/header.php';
                                 <tbody>
                                     <?php foreach ($jobs as $job): ?>
                                         <tr>
-                                            <td>
-                                                <a href="<?php echo SITE_URL; ?>/pages/jobs/view.php?id=<?php echo $job['job_id']; ?>" target="_blank">
-                                                    <?php echo htmlspecialchars($job['job_title']); ?>
-                                                </a>
-                                            </td>
+                                            <td><?php echo htmlspecialchars($job['job_title']); ?></td>
                                             <td><?php echo htmlspecialchars($job['job_type']); ?></td>
                                             <td><?php echo htmlspecialchars($job['location']); ?></td>
-                                            <td><?php echo formatSalaryRange($job['salary_min'], $job['salary_max']); ?></td>
                                             <td><?php echo date('M d, Y', strtotime($job['posted_date'])); ?></td>
                                             <td>
-                                                <?php if ($job['is_active']): ?>
-                                                    <span class="badge bg-success">Active</span>
-                                                <?php else: ?>
-                                                    <span class="badge bg-secondary">Inactive</span>
-                                                <?php endif; ?>
+                                                <span class="badge <?php echo $job['is_active'] ? 'bg-success' : 'bg-secondary'; ?>">
+                                                    <?php echo $job['is_active'] ? 'Active' : 'Inactive'; ?>
+                                                </span>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -188,32 +190,11 @@ require_once '../../includes/header.php';
                         </div>
                     <?php else: ?>
                         <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i> This company has not posted any jobs yet.
+                            <i class="fas fa-info-circle"></i> No job listings found for this company.
                         </div>
                     <?php endif; ?>
                 </div>
             </div>
-            
-            <?php if (isset($company['license_path']) && $company['license_path']): ?>
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">License Document</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="ratio ratio-16x9">
-                            <iframe src="<?php echo SITE_URL; ?>/uploads/licenses/<?php echo $company['license_path']; ?>" allowfullscreen></iframe>
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <a href="<?php echo SITE_URL; ?>/uploads/licenses/<?php echo $company['license_path']; ?>" target="_blank" class="btn btn-primary">
-                            <i class="fas fa-external-link-alt"></i> Open in New Tab
-                        </a>
-                        <a href="<?php echo SITE_URL; ?>/uploads/licenses/<?php echo $company['license_path']; ?>" download class="btn btn-outline-secondary">
-                            <i class="fas fa-download"></i> Download
-                        </a>
-                    </div>
-                </div>
-            <?php endif; ?>
         </div>
     </div>
 </div>

@@ -42,9 +42,18 @@
         </div>
     </footer>
 
-    <!-- Bootstrap and jQuery JavaScript -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery already included in header -->
+    <?php if (!defined('BOOTSTRAP_LOADED')): ?>
+    <!-- Bootstrap JavaScript already loaded in header, this is just a fallback -->
+    <script>
+        if (typeof bootstrap === 'undefined') {
+            console.log('Bootstrap not loaded in header, loading as fallback');
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js';
+            document.body.appendChild(script);
+        }
+    </script>
+    <?php endif; ?>
     
     <!-- Pass PHP variables to JavaScript -->
     <script>

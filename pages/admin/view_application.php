@@ -19,7 +19,7 @@ if ($applicationId <= 0) {
 }
 
 // Get application details joined with user and job information
-$sql = "SELECT a.*, j.job_title, j.job_id, c.company_name, c.company_id, 
+$sql = "SELECT a.*, j.job_title, j.job_id, c.company_name, c.company_id, c.user_id as company_user_id,
                u.email as applicant_email, u.username as applicant_username, u.profile_picture as applicant_picture
         FROM applications a 
         JOIN jobs j ON a.job_id = j.job_id 
@@ -45,7 +45,7 @@ require_once '../../includes/header.php';
                     <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>">Home</a></li>
                     <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>/pages/admin/dashboard.php">Admin Dashboard</a></li>
                     <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>/pages/admin/companies.php">Manage Companies</a></li>
-                    <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>/pages/admin/view_company.php?id=<?php echo $application['company_id']; ?>">View Company</a></li>
+                    <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>/pages/admin/view_user.php?id=<?php echo $application['company_user_id']; ?>">View Company</a></li>
                     <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>/pages/admin/view_job.php?id=<?php echo $application['job_id']; ?>">View Job</a></li>
                     <li class="breadcrumb-item active" aria-current="page">View Application</li>
                 </ol>
@@ -128,7 +128,7 @@ require_once '../../includes/header.php';
                         <div class="row">
                             <div class="col-6 text-muted">Company:</div>
                             <div class="col-6 text-end">
-                                <a href="<?php echo SITE_URL; ?>/pages/admin/view_company.php?id=<?php echo $application['company_id']; ?>">
+                                <a href="<?php echo SITE_URL; ?>/pages/admin/view_user.php?id=<?php echo $application['company_user_id']; ?>">
                                     <?php echo htmlspecialchars($application['company_name']); ?>
                                 </a>
                             </div>

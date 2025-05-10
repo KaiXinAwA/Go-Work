@@ -15,7 +15,7 @@ $licenseStatus = isset($_GET['status']) ? sanitizeInput($_GET['status']) : '';
 $searchTerm = isset($_GET['search']) ? sanitizeInput($_GET['search']) : '';
 
 // Build query based on filters
-$sql = "SELECT c.*, u.email, u.username FROM companies c JOIN users u ON c.user_id = u.user_id";
+$sql = "SELECT c.*, u.email, u.username, u.user_id FROM companies c JOIN users u ON c.user_id = u.user_id";
 $types = '';
 $params = [];
 $whereAdded = false;
@@ -137,7 +137,7 @@ require_once '../../includes/header.php';
                                             <td><?php echo date('M d, Y', strtotime($company['created_at'])); ?></td>
                                             <td>
                                                 <div class="btn-group" role="group">
-                                                    <a href="<?php echo SITE_URL; ?>/pages/admin/view_company.php?id=<?php echo $company['company_id']; ?>" class="btn btn-sm btn-outline-info" title="View">
+                                                    <a href="<?php echo SITE_URL; ?>/pages/admin/view_user.php?id=<?php echo $company['user_id']; ?>" class="btn btn-sm btn-outline-info" title="View">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
                                                     <?php if (isset($company['license_path']) && $company['license_path']): ?>

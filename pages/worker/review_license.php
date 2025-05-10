@@ -242,23 +242,21 @@ require_once '../../includes/header.php';
                         <div class="mb-3">
                             <label class="form-label">Update License Status</label>
                             <div class="form-check mb-2">
-                                <input class="form-check-input" type="radio" name="status" id="statusApproved" value="Approved" required>
+                                <input class="form-check-input" type="radio" name="status" id="statusApproved" value="Approved" required 
+                                    <?php echo $company['license_status'] === 'Approved' ? 'checked' : ''; ?>>
                                 <label class="form-check-label" for="statusApproved">
                                     <span class="badge bg-success">Approve</span> - Valid license, allow job posting
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="status" id="statusNotApproved" value="Not Approved" required>
-                                <label class="form-check-label" for="statusNotApproved">
-                                    <span class="badge bg-danger">Reject</span> - Invalid license, deny job posting
+                                <input class="form-check-input" type="radio" name="status" id="statusRejected" value="Not Approved" required
+                                    <?php echo $company['license_status'] === 'Not Approved' ? 'checked' : ''; ?>>
+                                <label class="form-check-label" for="statusRejected">
+                                    <span class="badge bg-danger">Reject</span> - Invalid or insufficient license
                                 </label>
                             </div>
                         </div>
-                        
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">Submit Decision</button>
-                            <a href="<?php echo SITE_URL; ?>/pages/worker/review_license.php" class="btn btn-outline-secondary">Back to List</a>
-                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Update Status</button>
                     </form>
                 </div>
             </div>

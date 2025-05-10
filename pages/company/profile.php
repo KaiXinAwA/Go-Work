@@ -19,6 +19,21 @@ require_once '../../includes/header.php';
 ?>
 
 <div class="container">
+    <!-- Status messages -->
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
+    
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
+
     <div class="row mb-4">
         <div class="col-12">
             <nav aria-label="breadcrumb">
@@ -64,6 +79,7 @@ require_once '../../includes/header.php';
             <!-- Profile Menu -->
             <div class="list-group mt-4">
                 <a href="#company-info" class="list-group-item list-group-item-action">Company Information</a>
+                <a href="#culture-info" class="list-group-item list-group-item-action">Company Culture</a>
                 <a href="#license" class="list-group-item list-group-item-action">License</a>
             </div>
         </div>
@@ -121,9 +137,64 @@ require_once '../../includes/header.php';
                             <button type="submit" class="btn btn-primary">Save Changes</button>
                         </div>
                     </form>
+                </div>
+            </div>
+            
+            <!-- Company Culture -->
+            <div class="card mb-4" id="culture-info">
+                <div class="card-header">
+                    <h5 class="mb-0">Company Culture</h5>
+                </div>
+                <div class="card-body">
+                    <?php 
+                    // Get company culture information
+                    $companyCulture = getCompanyCulture($company['company_id']);
                     
-                    <div class="mt-3 text-center">
-                        <a href="../../pages/forgot_password.php">Need to change your password?</a>
+                    // Define attribute display names for better readability
+                    $attributeNames = [
+                        'work_environment' => 'Work Environment',
+                        'overtime' => 'Overtime Expectations',
+                        'management' => 'Management Style',
+                        'work_life_balance' => 'Work-Life Balance',
+                        'dress_code' => 'Dress Code',
+                        'communication' => 'Communication Style',
+                        'decision_making' => 'Decision Making',
+                        'innovation' => 'Innovation',
+                        'social_events' => 'Social Events',
+                        'feedback' => 'Feedback Style'
+                    ];
+                    
+                    if ($companyCulture && !empty($companyCulture['values'])):
+                    ?>
+                        <div class="mb-4">
+                            <?php if (!empty($companyCulture['description'])): ?>
+                                <h6>About Our Culture</h6>
+                                <p><?php echo nl2br(htmlspecialchars($companyCulture['description'])); ?></p>
+                                <hr>
+                            <?php endif; ?>
+                            
+                            <h6>Our Culture Values</h6>
+                            <div class="row">
+                                <?php foreach ($companyCulture['values'] as $attribute => $value): ?>
+                                    <div class="col-md-6 mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-dark me-2"><?php echo isset($attributeNames[$attribute]) ? htmlspecialchars($attributeNames[$attribute]) : htmlspecialchars(ucfirst($attribute)); ?></span>
+                                            <span><?php echo htmlspecialchars(ucfirst($value)); ?></span>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <div class="alert alert-info">
+                            <p>You haven't defined your company culture yet. Setting your company's culture helps job seekers find a good match with your organization.</p>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="<?php echo SITE_URL; ?>/pages/company/culture_settings.php" class="btn btn-primary">
+                            <?php echo ($companyCulture && !empty($companyCulture['values'])) ? 'Edit Culture Settings' : 'Define Company Culture'; ?>
+                        </a>
                     </div>
                 </div>
             </div>

@@ -218,6 +218,42 @@ require_once '../../includes/header.php';
             </div>
         </div>
     </div>
+    
+    <!-- Admin Tools Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Admin Tools</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-user-cog fa-3x mb-3 text-info"></i>
+                                    <h5>User Type Debugger</h5>
+                                    <p class="small text-muted">Diagnose user type related issues</p>
+                                    <a href="<?php echo SITE_URL; ?>/pages/admin/users_combined.php" class="btn btn-sm btn-outline-info">Find Users</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-history fa-3x mb-3 text-success"></i>
+                                    <h5>Career History Tools</h5>
+                                    <p class="small text-muted">Fix issues with career history data</p>
+                                    <a href="<?php echo SITE_URL; ?>/api/admin/debug_career_history.php?id=2" class="btn btn-sm btn-outline-success">Debug Sample User</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <?php

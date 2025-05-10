@@ -17,6 +17,9 @@ $userProfile = getUserProfile($user['user_id']);
 // Get career history
 $careerHistory = getUserCareerHistory($user['user_id']);
 
+// Get culture quiz results
+$userCultureResults = getUserCultureResults($user['user_id']);
+
 // Include header
 require_once '../../includes/header.php';
 ?>
@@ -69,6 +72,7 @@ require_once '../../includes/header.php';
                 <div class="card-body p-0">
                     <div class="list-group list-group-flush">
                         <a href="#profile-info" class="list-group-item list-group-item-action">Profile Information</a>
+                        <a href="#culture-preferences" class="list-group-item list-group-item-action">Culture Preferences</a>
                         <a href="#skills-section" class="list-group-item list-group-item-action">Skills</a>
                         <a href="#career-history" class="list-group-item list-group-item-action">Career History</a>
                         <a href="#education-section" class="list-group-item list-group-item-action">Education</a>
@@ -169,9 +173,13 @@ require_once '../../includes/header.php';
                     <?php else: ?>
                         <div class="accordion" id="careerAccordion">
                             <?php foreach ($careerHistory as $index => $position): ?>
+                                <?php 
+                                // Generate a unique identifier if ID doesn't exist
+                                $positionId = isset($position['id']) ? $position['id'] : (isset($position['career_history_id']) ? $position['career_history_id'] : 'position_' . $index);
+                                ?>
                                 <div class="accordion-item mb-3 border">
-                                    <h2 class="accordion-header" id="heading<?php echo $position['id']; ?>">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?php echo $position['id']; ?>" aria-expanded="false" aria-controls="collapse<?php echo $position['id']; ?>">
+                                    <h2 class="accordion-header" id="heading<?php echo $positionId; ?>">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?php echo $positionId; ?>" aria-expanded="false" aria-controls="collapse<?php echo $positionId; ?>">
                                             <div class="d-flex w-100 justify-content-between align-items-center">
                                                 <div>
                                                     <strong><?php echo htmlspecialchars($position['job_title']); ?></strong> at <?php echo htmlspecialchars($position['company_name']); ?>
@@ -186,14 +194,14 @@ require_once '../../includes/header.php';
                                             </div>
                                         </button>
                                     </h2>
-                                    <div id="collapse<?php echo $position['id']; ?>" class="accordion-collapse collapse" aria-labelledby="heading<?php echo $position['id']; ?>" data-bs-parent="#careerAccordion">
+                                    <div id="collapse<?php echo $positionId; ?>" class="accordion-collapse collapse" aria-labelledby="heading<?php echo $positionId; ?>" data-bs-parent="#careerAccordion">
                                         <div class="accordion-body">
                                             <p><?php echo nl2br(htmlspecialchars($position['description'])); ?></p>
                                             <div class="d-flex justify-content-end gap-2">
                                                 <button type="button" class="btn btn-sm btn-outline-dark custom-btn" 
                                                         data-bs-toggle="modal" 
                                                         data-bs-target="#editCareerModal"
-                                                        data-id="<?php echo $position['id']; ?>"
+                                                        data-id="<?php echo $positionId; ?>"
                                                         data-job-title="<?php echo htmlspecialchars($position['job_title']); ?>"
                                                         data-company-name="<?php echo htmlspecialchars($position['company_name']); ?>"
                                                         data-start-date="<?php echo $position['start_date']; ?>"
@@ -204,7 +212,7 @@ require_once '../../includes/header.php';
                                                 <button type="button" class="btn btn-sm btn-outline-danger custom-btn" 
                                                         data-bs-toggle="modal" 
                                                         data-bs-target="#deleteCareerModal"
-                                                        data-id="<?php echo $position['id']; ?>"
+                                                        data-id="<?php echo $positionId; ?>"
                                                         data-job-title="<?php echo htmlspecialchars($position['job_title']); ?>">
                                                     <i class="fas fa-trash-alt me-1"></i> Delete
                                                 </button>
@@ -257,6 +265,62 @@ require_once '../../includes/header.php';
                             <button type="submit" class="btn btn-dark custom-btn">Save Education</button>
                         </div>
                     </form>
+                </div>
+            </div>
+            
+            <!-- Culture Preferences Card -->
+            <div class="card mb-4" id="culture-preferences">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Work Culture Preferences</h5>
+                </div>
+                <div class="card-body">
+                    <?php if ($userCultureResults && !empty($userCultureResults['culture_profile']['values'])): ?>
+                        <div class="mb-3">
+                            <p>Your work style and culture preferences based on the culture quiz:</p>
+                            
+                            <div class="row">
+                                <?php 
+                                $attributeNames = [
+                                    'work_environment' => 'Work Environment',
+                                    'overtime' => 'Overtime Expectations',
+                                    'management' => 'Management Style',
+                                    'work_life_balance' => 'Work-Life Balance',
+                                    'dress_code' => 'Dress Code',
+                                    'communication' => 'Communication Style',
+                                    'decision_making' => 'Decision Making',
+                                    'innovation' => 'Innovation',
+                                    'social_events' => 'Social Events',
+                                    'feedback' => 'Feedback Style'
+                                ];
+                                
+                                foreach ($userCultureResults['culture_profile']['values'] as $attribute => $value): 
+                                ?>
+                                    <div class="col-md-6 mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-dark me-2"><?php echo isset($attributeNames[$attribute]) ? htmlspecialchars($attributeNames[$attribute]) : htmlspecialchars(ucfirst($attribute)); ?></span>
+                                            <span><?php echo htmlspecialchars(ucfirst($value)); ?></span>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <p>These preferences are used to match you with companies that have a compatible work culture.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <a href="<?php echo SITE_URL; ?>/pages/culture_quiz.php" class="btn btn-dark custom-btn">Retake Culture Quiz</a>
+                        </div>
+                    <?php else: ?>
+                        <div class="alert alert-info">
+                            <p>You haven't taken the culture fit quiz yet. Taking this quiz will help us match you with companies that share your work style and values.</p>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <a href="<?php echo SITE_URL; ?>/pages/culture_quiz.php" class="btn btn-dark custom-btn">Take Culture Quiz</a>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
             

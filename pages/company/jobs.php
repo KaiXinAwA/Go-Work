@@ -113,46 +113,25 @@ require_once '../../includes/header.php';
                                                 </a>
                                             </td>
                                             <td>
-                                                <div class="dropdown">
-                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton<?php echo $job['job_id']; ?>" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        Actions
+                                                <div class="btn-group">
+                                                    <a href="<?php echo SITE_URL; ?>/pages/jobs.php?id=<?php echo $job['job_id']; ?>" class="btn btn-sm btn-outline-secondary">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="<?php echo SITE_URL; ?>/pages/company/edit_job.php?id=<?php echo $job['job_id']; ?>" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <?php if ($job['is_active']): ?>
+                                                        <a href="<?php echo SITE_URL; ?>/api/jobs/toggle_status.php?id=<?php echo $job['job_id']; ?>&status=0" class="btn btn-sm btn-outline-warning">
+                                                            <i class="fas fa-pause-circle"></i>
+                                                        </a>
+                                                    <?php else: ?>
+                                                        <a href="<?php echo SITE_URL; ?>/api/jobs/toggle_status.php?id=<?php echo $job['job_id']; ?>&status=1" class="btn btn-sm btn-outline-success">
+                                                            <i class="fas fa-play-circle"></i>
+                                                        </a>
+                                                    <?php endif; ?>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal<?php echo $job['job_id']; ?>">
+                                                        <i class="fas fa-trash-alt"></i>
                                                     </button>
-                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton<?php echo $job['job_id']; ?>">
-                                                        <li>
-                                                            <a class="dropdown-item" href="<?php echo SITE_URL; ?>/pages/jobs.php?id=<?php echo $job['job_id']; ?>">
-                                                                <i class="fas fa-eye me-1"></i> View Job
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a class="dropdown-item" href="<?php echo SITE_URL; ?>/pages/company/edit_job.php?id=<?php echo $job['job_id']; ?>">
-                                                                <i class="fas fa-edit me-1"></i> Edit Job
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a class="dropdown-item" href="<?php echo SITE_URL; ?>/pages/company/applications.php?job_id=<?php echo $job['job_id']; ?>">
-                                                                <i class="fas fa-users me-1"></i> View Applications
-                                                            </a>
-                                                        </li>
-                                                        <li><hr class="dropdown-divider"></li>
-                                                        <?php if ($job['is_active']): ?>
-                                                            <li>
-                                                                <a class="dropdown-item text-warning" href="<?php echo SITE_URL; ?>/api/jobs/toggle_status.php?id=<?php echo $job['job_id']; ?>&status=0">
-                                                                    <i class="fas fa-pause-circle me-1"></i> Deactivate
-                                                                </a>
-                                                            </li>
-                                                        <?php else: ?>
-                                                            <li>
-                                                                <a class="dropdown-item text-success" href="<?php echo SITE_URL; ?>/api/jobs/toggle_status.php?id=<?php echo $job['job_id']; ?>&status=1">
-                                                                    <i class="fas fa-play-circle me-1"></i> Activate
-                                                                </a>
-                                                            </li>
-                                                        <?php endif; ?>
-                                                        <li>
-                                                            <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal<?php echo $job['job_id']; ?>">
-                                                                <i class="fas fa-trash-alt me-1"></i> Delete
-                                                            </a>
-                                                        </li>
-                                                    </ul>
                                                 </div>
                                                 
                                                 <!-- Delete Modal -->

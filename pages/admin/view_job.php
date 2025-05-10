@@ -19,7 +19,7 @@ if ($jobId <= 0) {
 }
 
 // Get job details joined with company information
-$sql = "SELECT j.*, c.company_name, c.company_id, u.email, u.profile_picture
+$sql = "SELECT j.*, c.company_name, c.company_id, u.email, u.profile_picture, c.user_id as company_user_id
         FROM jobs j 
         JOIN companies c ON j.company_id = c.company_id 
         JOIN users u ON c.user_id = u.user_id
@@ -51,7 +51,7 @@ require_once '../../includes/header.php';
                     <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>">Home</a></li>
                     <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>/pages/admin/dashboard.php">Admin Dashboard</a></li>
                     <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>/pages/admin/companies.php">Manage Companies</a></li>
-                    <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>/pages/admin/view_company.php?id=<?php echo $job['company_id']; ?>">View Company</a></li>
+                    <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>/pages/admin/view_user.php?id=<?php echo $job['company_user_id']; ?>">View Company</a></li>
                     <li class="breadcrumb-item active" aria-current="page">View Job</li>
                 </ol>
             </nav>
@@ -60,7 +60,7 @@ require_once '../../includes/header.php';
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>Job Details</h2>
                 <div>
-                    <a href="<?php echo SITE_URL; ?>/pages/admin/view_company.php?id=<?php echo $job['company_id']; ?>" class="btn btn-secondary">
+                    <a href="<?php echo SITE_URL; ?>/pages/admin/view_user.php?id=<?php echo $job['company_user_id']; ?>" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Back to Company
                     </a>
                     <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteJobModal">
@@ -86,7 +86,7 @@ require_once '../../includes/header.php';
                         <?php endif; ?>
                         <div>
                             <h5 class="mb-0"><?php echo htmlspecialchars($job['company_name']); ?></h5>
-                            <a href="<?php echo SITE_URL; ?>/pages/admin/view_company.php?id=<?php echo $job['company_id']; ?>" class="text-decoration-none">
+                            <a href="<?php echo SITE_URL; ?>/pages/admin/view_user.php?id=<?php echo $job['company_user_id']; ?>" class="text-decoration-none">
                                 View Company Profile
                             </a>
                         </div>

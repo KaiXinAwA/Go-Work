@@ -116,34 +116,6 @@ require_once '../../includes/header.php';
             </div>
         </div>
     </div>
-    
-    <div class="row">
-        <!-- Quick Actions -->
-        <div class="col-12 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Quick Actions</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <a href="<?php echo SITE_URL; ?>/pages/worker/companies.php" class="btn btn-success w-100 py-3">
-                                <i class="fas fa-building mb-2 d-block fa-2x"></i>
-                                View Companies
-                            </a>
-                        </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            <a href="<?php echo SITE_URL; ?>/pages/worker/review_license.php" class="btn btn-info w-100 py-3">
-                                <i class="fas fa-file-contract mb-2 d-block fa-2x"></i>
-                                Review Licenses
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <?php require_once '../../includes/footer.php'; ?> 

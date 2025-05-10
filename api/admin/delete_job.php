@@ -34,6 +34,23 @@ try {
 
     $companyId = $job['company_id'];
 
+    // Get company info before deleting the job
+    $companyInfo = fetchRow(
+        "SELECT c.company_id, c.user_id 
+        FROM jobs j 
+        JOIN companies c ON j.company_id = c.company_id 
+        WHERE j.job_id = ?", 
+        'i', 
+        [$jobId]
+    );
+
+    if (!$companyInfo) {
+        $_SESSION['error'] = 'Job not found';
+        redirectTo(SITE_URL . '/pages/admin/companies.php');
+    }
+
+    $companyUserId = $companyInfo['user_id'];
+
     // Start transaction directly
     $conn->begin_transaction();
 
@@ -54,7 +71,7 @@ try {
     // If we got here, commit the transaction directly
     $conn->commit();
     $_SESSION['success'] = 'Job and all associated applications deleted successfully';
-    redirectTo(SITE_URL . '/pages/admin/view_company.php?id=' . $companyId);
+    redirectTo(SITE_URL . '/pages/admin/view_user.php?id=' . $companyUserId);
 
 } catch (Exception $e) {
     // An error occurred, rollback and show error

@@ -120,7 +120,7 @@ require_once '../../includes/header.php';
                             <div class="col-md-6">
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-search"></i></span>
-                                    <input type="text" class="form-control" placeholder="Search applicants..." id="searchApplicants">
+                                    <input type="text" class="form-control" placeholder="Search applicants name or email" id="searchApplicants">
                                 </div>
                             </div>
                             <div class="col-md-6">

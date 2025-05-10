@@ -77,8 +77,7 @@ $jobData = [
     'categories' => $category_string,
     'salary_min' => $salary_min,
     'salary_max' => $salary_max,
-    'is_active' => $is_active,
-    'updated_at' => date('Y-m-d H:i:s')
+    'is_active' => $is_active
 ];
 
 $updated = updateData('jobs', $jobData, 'job_id', $job_id);

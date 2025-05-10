@@ -72,12 +72,6 @@ require_once '../../includes/header.php';
                     
                     <h4><?php echo $userProfile && $userProfile['full_name'] ? htmlspecialchars($userProfile['full_name']) : htmlspecialchars($user['username']); ?></h4>
                     <p class="text-muted"><?php echo htmlspecialchars($user['email']); ?></p>
-                    
-                    <div class="d-grid gap-2">
-                        <a href="<?php echo SITE_URL; ?>/pages/user/applications.php" class="btn btn-primary">
-                            <i class="fas fa-briefcase"></i> My Applications
-                        </a>
-                    </div>
                 </div>
                 <div class="card-footer">
                     <div class="row text-center">

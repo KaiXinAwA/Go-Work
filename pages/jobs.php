@@ -5,8 +5,8 @@ require_once '../includes/database.php';
 require_once '../includes/functions.php';
 
 // Add custom CSS for nested accordion
-$customCSS = '
-<style>
+$customCSS = '<style>
+    /* Accordion styles */
     .nested-accordion .accordion-item {
         border-radius: 0;
         border-left: none;
@@ -36,8 +36,58 @@ $customCSS = '
     .nested-accordion .form-check-label {
         font-size: 0.9rem;
     }
-</style>
-';
+    
+    /* Container layout */
+    .jobs-container {
+        position: relative;
+        z-index: 50;
+        min-height: 500px; /* Reduced from 800px */
+    }
+    
+    section.container {
+        padding-top: 10px;
+    }
+    
+    /* Filter dropdown styles - minimal version */
+    .filter-dropdown .dropdown-menu {
+        border-radius: 0.5rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        margin-top: 0.5rem;
+    }
+    
+    .filter-dropdown .accordion-button:not(.collapsed) {
+        background-color: #f8f9fa;
+        color: #0d6efd;
+        box-shadow: none;
+    }
+    
+    .filter-dropdown h6 {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .filter-dropdown hr {
+        margin: 0.75rem 0;
+        opacity: 0.1;
+    }
+    
+    .filter-dropdown .form-check-input:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+    
+    /* Ensure space for dropdown */
+    .col-md-8 {
+        min-height: 400px; /* Reduced from 600px */
+    }
+    
+    /* Force spacer to be visible */
+    .dropdown-spacer {
+        display: block !important;
+        min-height: 150px; /* Reduced from 300px */
+    }
+</style>';
 
 // Get search parameters
 $keywords = isset($_GET['keywords']) ? sanitizeInput($_GET['keywords']) : '';
@@ -222,8 +272,15 @@ require_once '../includes/header.php';
                         Company Information
                     </div>
                     <div class="card-body">
-                        <h5><?php echo htmlspecialchars($job['company_name']); ?></h5>
+                        <h5>
+                            <a href="<?php echo SITE_URL; ?>/pages/view_company_profile.php?id=<?php echo $job['company_id']; ?>" class="text-decoration-none">
+                                <?php echo htmlspecialchars($job['company_name']); ?>
+                            </a>
+                        </h5>
                         <p><?php echo nl2br(htmlspecialchars($job['company_description'])); ?></p>
+                        <a href="<?php echo SITE_URL; ?>/pages/view_company_profile.php?id=<?php echo $job['company_id']; ?>" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-building"></i> View Company Profile
+                        </a>
                     </div>
                 </div>
                 
@@ -250,6 +307,7 @@ require_once '../includes/header.php';
     </div>
 <?php else: ?>
     <!-- Job Search and Listing -->
+    <div class="jobs-container">
     <section class="container">
         <div class="row mb-4">
             <div class="col-12">
@@ -261,34 +319,40 @@ require_once '../includes/header.php';
         <div class="search-box mb-4">
             <form action="<?php echo SITE_URL; ?>/pages/jobs.php" method="GET" id="job-search-form">
                 <div class="row g-3">
-                    <div class="col-md-5">
+                    <div class="col-md-6">
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-search"></i></span>
                             <input type="text" class="form-control" name="keywords" id="keywords" placeholder="Job title, keywords, or company" value="<?php echo htmlspecialchars($keywords); ?>">
                         </div>
                     </div>
-                    <div class="col-md-5">
+                    <div class="col-md-6">
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
                             <input type="text" class="form-control" name="location" id="location" placeholder="State" value="<?php echo htmlspecialchars($location); ?>">
                         </div>
                     </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary w-100">Search</button>
-                    </div>
                 </div>
             </form>
         </div>
-        
         <div class="row">
-            <!-- Filter section - always visible -->
+            <!-- Filter section - simplified dropdown -->
             <div class="col-md-4 mb-4">
                 <!-- Job Filters -->
-                <div class="card">
-                    <div class="card-header">
-                        Filter Jobs
-                    </div>
-                    <div class="card-body">
+                <div class="dropdown filter-dropdown">
+                    <button class="btn btn-primary w-100 d-flex justify-content-between align-items-center" 
+                            type="button" id="filterDropdown" 
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <span>
+                                <i class="fas fa-filter me-2"></i> Filter Jobs
+                            </span>
+                            <span>
+                                <span class="filter-count badge bg-light text-primary" style="display: none;">0</span>
+                                <i class="fas fa-chevron-down ms-2"></i>
+                            </span>
+                    </button>
+                    <div class="dropdown-menu p-3 filter-menu w-100" 
+                         aria-labelledby="filterDropdown">
                         <form action="<?php echo SITE_URL; ?>/pages/jobs.php" method="GET" id="advanced-filter-form">
                             <!-- Preserve main search parameters -->
                             <input type="hidden" name="keywords" value="<?php echo htmlspecialchars($keywords); ?>">
@@ -512,7 +576,7 @@ require_once '../includes/header.php';
                                 </div>
                             </div>
 
-                            <div class="mb-3"></div>
+                            <hr>
 
                             <h6>Categories</h6>
                             <div class="mb-3">
@@ -814,29 +878,41 @@ require_once '../includes/header.php';
                                 </div>
                             </div>
                             
+                            <hr>
+                            
                             <h6>Salary Range</h6>
                             <div class="mb-3">
-                                <div class="row g-2">
+                                    <div class="row g-3">
                                     <div class="col-6">
                                         <label for="min_salary" class="form-label small">From (RM)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
                                         <input type="number" class="form-control" id="min_salary" name="min_salary" 
                                                placeholder="Min" min="0" step="100" 
                                                value="<?php echo isset($_GET['min_salary']) ? htmlspecialchars($_GET['min_salary']) : ''; ?>">
+                                            </div>
                                     </div>
                                     <div class="col-6">
                                         <label for="max_salary" class="form-label small">To (RM)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
                                         <input type="number" class="form-control" id="max_salary" name="max_salary" 
                                                placeholder="Max" min="0" step="100" 
                                                value="<?php echo isset($_GET['max_salary']) ? htmlspecialchars($_GET['max_salary']) : ''; ?>">
+                                            </div>
                                     </div>
                                 </div>
                             </div>
+                            
+                            <hr>
                             
                             <h6>Date Posted</h6>
                             <div class="mb-3">
                                 <?php 
                                 $datePosted = isset($_GET['date_posted']) ? $_GET['date_posted'] : 'any';
                                 ?>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
                                 <select class="form-select" name="date_posted" id="date_posted">
                                     <option value="any" <?php echo ($datePosted == 'any' || empty($datePosted)) ? 'selected' : ''; ?>>Any time</option>
                                     <option value="today" <?php echo ($datePosted == 'today') ? 'selected' : ''; ?>>Today</option>
@@ -845,13 +921,7 @@ require_once '../includes/header.php';
                                     <option value="three_months" <?php echo ($datePosted == 'three_months') ? 'selected' : ''; ?>>Last 3 months</option>
                                     <option value="six_months" <?php echo ($datePosted == 'six_months') ? 'selected' : ''; ?>>Last 6 months</option>
                                 </select>
-                            </div>
-                            
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-outline-primary">Apply Filters</button>
-                                <?php if(!empty($jobTypes) || !empty($categories) || !empty($minSalary) || !empty($maxSalary) || $datePosted != 'any'): ?>
-                                    <button type="button" class="btn btn-outline-dark mt-2" id="clear-filters">Clear Filters</button>
-                                <?php endif; ?>
+                                    </div>
                             </div>
                         </form>
                     </div>
@@ -860,8 +930,16 @@ require_once '../includes/header.php';
             
             <!-- Results section - shows jobs or no results message -->
             <div class="col-md-8">
+                <!-- Active search filters section for live filtering -->
+                <div class="alert alert-info mb-3 active-search-filters" style="display: none;">
+                    <h6 class="mb-2">Active Filters:</h6>
+                    <span class="badge bg-primary me-2 keyword-filter" style="display: none;">Keywords: </span>
+                    <span class="badge bg-primary me-2 location-filter" style="display: none;">Location: </span>
+                </div>
+                
                 <?php if (!empty($categories) || !empty($jobTypes) || !empty($keywords) || !empty($location)): ?>
-                <div class="alert alert-info mb-3">
+                <!-- Server-side filters display - hidden when JS filters active -->
+                <div class="alert alert-info mb-3 server-side-filters">
                     <h6 class="mb-2">Active Filters:</h6>
                     <?php if (!empty($keywords)): ?>
                         <span class="badge bg-primary me-2">Keywords: <?php echo htmlspecialchars($keywords); ?></span>
@@ -887,7 +965,7 @@ require_once '../includes/header.php';
                 <?php endif; ?>
                 <?php if (isset($jobs) && !empty($jobs)): ?>
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <p class="mb-0"><?php echo count($jobs); ?> jobs found</p>
+                        <p class="mb-0 job-count"><?php echo count($jobs); ?> jobs found</p>
                         <div class="dropdown">
                             <?php 
                             $sort = isset($_GET['sort']) ? $_GET['sort'] : 'newest';
@@ -938,7 +1016,11 @@ require_once '../includes/header.php';
                                                 <?php echo htmlspecialchars($job['job_title']); ?>
                                             </a>
                                         </h5>
-                                        <h6 class="company-name"><?php echo htmlspecialchars($job['company_name']); ?></h6>
+                                        <h6 class="company-name">
+                                            <a href="<?php echo SITE_URL; ?>/pages/view_company_profile.php?id=<?php echo $job['company_id']; ?>" class="text-decoration-none">
+                                                <?php echo htmlspecialchars($job['company_name']); ?>
+                                            </a>
+                                        </h6>
                                         
                                         <div class="job-details">
                                             <div class="job-detail">
@@ -985,73 +1067,20 @@ require_once '../includes/header.php';
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <div class="alert alert-info">
+                    <div class="alert alert-info no-results-message">
                         <i class="fas fa-info-circle"></i> No jobs found matching your search criteria. Please try different keywords or location.
                     </div>
                 <?php endif; ?>
             </div>
         </div>
     </section>
+    </div>
 <?php endif; ?>
 
 <?php
-// Set extra JavaScript for jobs page
-$extraJS = '<script src="' . SITE_URL . '/assets/js/jobs.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    // Job Type checkbox functionality
-    const jobTypeCheckboxes = document.querySelectorAll(".job-type-checkbox");
-    const jobTypeCount = document.querySelector(".job-type-count");
-    const jobTypeButton = document.querySelector("[data-bs-target=\'#jobTypesCollapse\']");
-    
-    function updateJobTypeCount() {
-        const checkedCount = document.querySelectorAll(".job-type-checkbox:checked").length;
-        if (checkedCount > 0) {
-            jobTypeCount.textContent = checkedCount;
-            jobTypeCount.style.display = "inline-block";
-        } else {
-            jobTypeCount.style.display = "none";
-        }
-    }
-    
-    // Initial count update
-    updateJobTypeCount();
-    
-    // Add event listeners to each checkbox
-    jobTypeCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener("change", updateJobTypeCount);
-    });
-    
-    // Category checkbox functionality 
-    const categoryCheckboxes = document.querySelectorAll(".category-checkbox");
-    const categoryCount = document.querySelector(".category-count");
-    
-    function updateCategoryCount() {
-        const checkedCount = document.querySelectorAll(".category-checkbox:checked").length;
-        if (checkedCount > 0) {
-            categoryCount.textContent = checkedCount;
-            categoryCount.style.display = "inline-block";
-        } else {
-            categoryCount.style.display = "none";
-        }
-    }
-    
-    // Initial category count update
-    updateCategoryCount();
-    
-    // Add event listeners to each category checkbox
-    categoryCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener("change", updateCategoryCount);
-    });
-    
-    // Prevent nested accordion items from affecting parent accordion
-    document.querySelectorAll(".nested-accordion .accordion-button").forEach(button => {
-        button.addEventListener("click", function(e) {
-            e.stopPropagation();
-        });
-    });
-});
-</script>';
+// Set extra JavaScript for jobs page 
+$extraJS = '<script src="' . SITE_URL . '/assets/js/jobs-dropdown.js"></script>
+<script src="' . SITE_URL . '/assets/js/jobs.js"></script>';
 
 // Include footer
 require_once '../includes/footer.php';

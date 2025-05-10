@@ -52,6 +52,14 @@ if ($result) {
     $_SESSION['error'] = 'Failed to update license status';
 }
 
+// Get company's user ID
+$company = fetchRow("SELECT user_id FROM companies WHERE company_id = ?", 'i', [$companyId]);
+
+if (!$company) {
+    $_SESSION['error'] = 'Company not found';
+    redirectTo(SITE_URL . '/pages/admin/companies.php');
+}
+
 // Redirect back to company view
-redirectTo(SITE_URL . '/pages/admin/view_company.php?id=' . $companyId);
+redirectTo(SITE_URL . '/pages/admin/view_user.php?id=' . $company['user_id']);
 ?> 

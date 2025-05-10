@@ -537,10 +537,12 @@ function searchJobs($keywords = '', $location = '', $jobTypes = [], $categories 
     
     // Add keyword search
     if (!empty($keywords)) {
-        $sql .= " AND (j.job_title LIKE ? OR j.description LIKE ? OR j.requirements LIKE ? OR j.job_type LIKE ? OR j.categories LIKE ?)";
+        // For keywords that might match job types, handle spaces and dashes better
+        $keywordParam = '%' . str_replace([' ', '-'], '%', $keywords) . '%';
+        
+        $sql .= " AND (j.job_title LIKE ? OR j.description LIKE ? OR j.requirements LIKE ? OR LOWER(j.job_type) LIKE LOWER(?) OR j.categories LIKE ?)";
         $types .= 'sssss';
-        $keywordParam = '%' . $keywords . '%';
-        $params = array_merge($params, [$keywordParam, $keywordParam, $keywordParam, $keywordParam, $keywordParam]);
+        $params = array_merge($params, ['%' . $keywords . '%', '%' . $keywords . '%', '%' . $keywords . '%', $keywordParam, '%' . $keywords . '%']);
     }
     
     // Add location search
@@ -554,9 +556,12 @@ function searchJobs($keywords = '', $location = '', $jobTypes = [], $categories 
     if (!empty($jobTypes)) {
         $jobTypeConditions = [];
         foreach ($jobTypes as $type) {
-            $jobTypeConditions[] = "j.job_type = ?";
+            // Make job type matching case-insensitive and allow fuzzy/partial matching
+            // Convert spaces to allow matching "Full-time" with "full time" etc.
+            $cleanType = str_replace([' ', '-'], '%', $type);
+            $jobTypeConditions[] = "LOWER(j.job_type) LIKE LOWER(?)";
             $types .= 's';
-            $params[] = $type;
+            $params[] = '%' . $cleanType . '%';
         }
         $sql .= " AND (" . implode(" OR ", $jobTypeConditions) . ")";
     }
@@ -754,4 +759,282 @@ function canWorkerManageUsers($workerId) {
     $sql = "SELECT can_manage_users FROM gowork_workers WHERE worker_id = ?";
     $result = fetchRow($sql, 'i', [$workerId]);
     return $result ? (bool)$result['can_manage_users'] : false;
+}
+
+/**
+ * Get all culture quiz questions with their options
+ * 
+ * @return array Array of questions with options
+ */
+function getCultureQuizQuestions() {
+    $questions = fetchAll("SELECT * FROM culture_quiz_questions ORDER BY question_id");
+    
+    foreach ($questions as &$question) {
+        $question['options'] = fetchAll(
+            "SELECT * FROM culture_quiz_options WHERE question_id = ? ORDER BY option_id",
+            'i', 
+            [$question['question_id']]
+        );
+    }
+    
+    return $questions;
+}
+
+/**
+ * Save user's culture quiz results
+ * 
+ * @param int $userId The user ID
+ * @param array $cultureProfile The culture profile data
+ * @return int|bool The result ID or false on failure
+ */
+function saveUserCultureResults($userId, $cultureProfile) {
+    // Check if user already has results
+    $existingResult = fetchRow(
+        "SELECT * FROM user_culture_results WHERE user_id = ?",
+        'i',
+        [$userId]
+    );
+    
+    $profileJson = json_encode($cultureProfile);
+    
+    if ($existingResult) {
+        // Update existing results
+        return updateData(
+            'user_culture_results',
+            ['culture_profile' => $profileJson],
+            'user_id',
+            $userId
+        );
+    } else {
+        // Insert new results
+        return insertData(
+            'user_culture_results',
+            [
+                'user_id' => $userId,
+                'culture_profile' => $profileJson
+            ]
+        );
+    }
+}
+
+/**
+ * Get user's culture quiz results
+ * 
+ * @param int $userId The user ID
+ * @return array|null The culture profile or null if not found
+ */
+function getUserCultureResults($userId) {
+    $result = fetchRow(
+        "SELECT * FROM user_culture_results WHERE user_id = ?",
+        'i',
+        [$userId]
+    );
+    
+    if ($result) {
+        $result['culture_profile'] = json_decode($result['culture_profile'], true);
+    }
+    
+    return $result;
+}
+
+/**
+ * Save company culture information
+ * 
+ * @param int $companyId The company ID
+ * @param array $cultureInfo The culture information
+ * @return bool True on success, false on failure
+ */
+function saveCompanyCulture($companyId, $cultureInfo) {
+    $cultureJson = json_encode($cultureInfo);
+    
+    return updateData(
+        'companies',
+        ['company_culture' => $cultureJson],
+        'company_id',
+        $companyId
+    );
+}
+
+/**
+ * Get company culture information
+ * 
+ * @param int $companyId The company ID
+ * @return array|null The culture information or null if not found
+ */
+function getCompanyCulture($companyId) {
+    $company = fetchRow(
+        "SELECT company_culture FROM companies WHERE company_id = ?",
+        'i',
+        [$companyId]
+    );
+    
+    if ($company && $company['company_culture']) {
+        return json_decode($company['company_culture'], true);
+    }
+    
+    return null;
+}
+
+/**
+ * Calculate culture fit score between user and company
+ * 
+ * @param int $userId The user ID
+ * @param int $companyId The company ID
+ * @return array The fit score and matching attributes
+ */
+function calculateCultureFitScore($userId, $companyId) {
+    $userCulture = getUserCultureResults($userId);
+    $companyCulture = getCompanyCulture($companyId);
+    
+    if (!$userCulture || !$companyCulture) {
+        return [
+            'score' => 0,
+            'matches' => [],
+            'mismatches' => []
+        ];
+    }
+    
+    $userValues = $userCulture['culture_profile']['values'];
+    $companyValues = $companyCulture['values'];
+    
+    $matches = [];
+    $mismatches = [];
+    $matchCount = 0;
+    
+    // Compare each value
+    foreach ($userValues as $key => $value) {
+        if (isset($companyValues[$key]) && $companyValues[$key] == $value) {
+            $matches[] = $key;
+            $matchCount++;
+        } else if (isset($companyValues[$key])) {
+            $mismatches[] = $key;
+        }
+    }
+    
+    $totalValues = count(array_unique(array_merge(array_keys($userValues), array_keys($companyValues))));
+    $score = ($totalValues > 0) ? round(($matchCount / $totalValues) * 100) : 0;
+    
+    return [
+        'score' => $score,
+        'matches' => $matches,
+        'mismatches' => $mismatches
+    ];
+}
+
+/**
+ * Get companies that match user's culture profile
+ * 
+ * @param int $userId The user ID
+ * @param int $limit The maximum number of companies to return
+ * @return array Array of companies with match scores
+ */
+function getMatchingCompanies($userId, $limit = 5) {
+    $companies = fetchAll("SELECT c.*, u.username FROM companies c JOIN users u ON c.user_id = u.user_id WHERE c.company_culture IS NOT NULL");
+    $matches = [];
+    
+    foreach ($companies as $company) {
+        $matchData = calculateCultureFitScore($userId, $company['company_id']);
+        
+        // Only include if there is some match
+        if ($matchData['score'] > 0) {
+            $company['match_score'] = $matchData['score'];
+            $company['matches'] = $matchData['matches'];
+            $company['mismatches'] = $matchData['mismatches'];
+            $matches[] = $company;
+        }
+    }
+    
+    // Sort by match score
+    usort($matches, function($a, $b) {
+        return $b['match_score'] - $a['match_score'];
+    });
+    
+    // Limit results
+    return array_slice($matches, 0, $limit);
+}
+
+/**
+ * Get enhanced career history for a user with error handling
+ * 
+ * @param int $userId The user ID
+ * @return array Array of career history entries with formatted dates
+ */
+function getEnhancedUserCareerHistory($userId) {
+    if (empty($userId)) {
+        return [];
+    }
+    
+    // Check if the user is a jobseeker
+    $user = fetchRow("SELECT user_type FROM users WHERE user_id = ?", 'i', [$userId]);
+    if (!$user) {
+        return []; // User not found
+    }
+    
+    // Ensure user type is correctly compared as integer
+    $userType = (int)$user['user_type'];
+    if ($userType !== USER_TYPE_JOBSEEKER) {
+        return []; // Return empty array for non-jobseekers
+    }
+    
+    // Get all career history entries for this user
+    $query = "SELECT * FROM career_history WHERE user_id = ? ORDER BY start_date DESC";
+    $careerHistory = fetchAll($query, 'i', [$userId]);
+    
+    if (!$careerHistory) {
+        return [];
+    }
+    
+    // Format the career history entries
+    $formattedHistory = [];
+    foreach ($careerHistory as $entry) {
+        // Ensure the career_id exists
+        if (!isset($entry['career_id']) && isset($entry['id'])) {
+            $entry['career_id'] = $entry['id'];
+        }
+        
+        // Format dates for display
+        $startDateFormatted = '';
+        $endDateFormatted = 'Present';
+        $duration = '';
+        
+        if (!empty($entry['start_date'])) {
+            try {
+                $startDate = new DateTime($entry['start_date']);
+                $startDateFormatted = $startDate->format('M Y');
+                
+                $endDate = !empty($entry['end_date']) ? new DateTime($entry['end_date']) : new DateTime();
+                if (!empty($entry['end_date'])) {
+                    $endDateFormatted = $endDate->format('M Y');
+                }
+                
+                // Calculate duration
+                $interval = $startDate->diff($endDate);
+                $years = $interval->y;
+                $months = $interval->m;
+                
+                if ($years > 0) {
+                    $duration = $years . ' year' . ($years > 1 ? 's' : '');
+                    if ($months > 0) {
+                        $duration .= ', ' . $months . ' month' . ($months > 1 ? 's' : '');
+                    }
+                } else {
+                    $duration = $months . ' month' . ($months > 1 ? 's' : '');
+                }
+            } catch (Exception $e) {
+                // Handle date formatting errors
+                $startDateFormatted = $entry['start_date'];
+                $endDateFormatted = $entry['end_date'] ?? 'Present';
+                $duration = 'Unknown';
+            }
+        }
+        
+        // Add formatted data to the entry
+        $entry['start_date_formatted'] = $startDateFormatted;
+        $entry['end_date_formatted'] = $endDateFormatted;
+        $entry['duration'] = $duration;
+        
+        $formattedHistory[] = $entry;
+    }
+    
+    return $formattedHistory;
 }

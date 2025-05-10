@@ -106,7 +106,7 @@ try {
     }
     
     $_SESSION['success'] = 'User updated successfully';
-    redirectTo(SITE_URL . '/pages/admin/users.php');
+    redirectTo(SITE_URL . '/pages/admin/users_combined.php');
     
 } catch (Exception $e) {
     $_SESSION['error'] = $e->getMessage();
