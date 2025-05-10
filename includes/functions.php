@@ -515,12 +515,96 @@ function getApplicationsByUser($userId) {
 }
 
 /**
- * Search jobs by keywords, location, and additional filters
+ * Normalize job type string for consistent matching
+ * 
+ * @param string $jobType The job type string to normalize
+ * @return string Normalized job type
+ */
+function normalizeJobType($jobType) {
+    $jobType = strtolower($jobType);
+    
+    // Replace spaces and hyphens with empty string
+    $jobType = str_replace([' ', '-'], '', $jobType);
+    
+    return $jobType;
+}
+
+/**
+ * Check if a search term is specifically looking for a job type
+ * 
+ * @param string $term The search term
+ * @return array|null ['job_type' => string, 'variations' => array] or null if not a job type search
+ */
+function identifyJobTypeSearch($term) {
+    $term = strtolower(trim($term));
+    
+    // Map of specific job types and their variations
+    $jobTypeMap = [
+        'full-time' => ['full time', 'full-time', 'fulltime', 'full'],
+        'part-time' => ['part time', 'part-time', 'parttime', 'part'],
+        'remote' => ['remote', 'remote work', 'work remotely'],
+        'work from home' => ['work from home', 'wfh', 'work-from-home', 'working from home'],
+        'on-site' => ['on site', 'on-site', 'onsite', 'on location'],
+        'hybrid' => ['hybrid', 'hybrid work'],
+        'internship' => ['internship', 'intern', 'internships'],
+        'contract' => ['contract', 'contractor'],
+        'temporary' => ['temporary', 'temp'],
+        'freelance' => ['freelance', 'freelancer']
+    ];
+    
+    // Check if term exactly matches any variation
+    foreach ($jobTypeMap as $jobType => $variations) {
+        if (in_array($term, $variations)) {
+            return [
+                'job_type' => $jobType,
+                'variations' => $variations,
+                'exact_match' => true
+            ];
+        }
+    }
+    
+    // Check if term contains specific job type indicators
+    foreach ($jobTypeMap as $jobType => $variations) {
+        foreach ($variations as $variation) {
+            // Check if search is specifically targeting this job type
+            if ($term === $variation || 
+                (strlen($term) > 3 && stripos($term, $variation) !== false)) {
+                return [
+                    'job_type' => $jobType,
+                    'variations' => $variations,
+                    'exact_match' => false
+                ];
+            }
+        }
+    }
+    
+    // Special check for time-based searches
+    if (stripos($term, 'time') !== false) {
+        if (stripos($term, 'full') !== false) {
+            return [
+                'job_type' => 'full-time',
+                'variations' => $jobTypeMap['full-time'],
+                'exact_match' => false
+            ];
+        } else if (stripos($term, 'part') !== false) {
+            return [
+                'job_type' => 'part-time',
+                'variations' => $jobTypeMap['part-time'],
+                'exact_match' => false
+            ];
+        }
+    }
+    
+    return null;
+}
+
+/**
+ * Search for jobs with filter criteria
  * 
  * @param string $keywords Keywords to search for
- * @param string $location Location to search in
- * @param array $jobTypes Array of job types to filter by
- * @param array $categories Array of categories to filter by
+ * @param string $location Location to filter by
+ * @param array $jobTypes Job types to filter by
+ * @param array $categories Categories to filter by
  * @param int $minSalary Minimum salary to filter by
  * @param int $maxSalary Maximum salary to filter by
  * @param string $datePosted Date filter (any, today, week, month)
@@ -537,12 +621,203 @@ function searchJobs($keywords = '', $location = '', $jobTypes = [], $categories 
     
     // Add keyword search
     if (!empty($keywords)) {
-        // For keywords that might match job types, handle spaces and dashes better
-        $keywordParam = '%' . str_replace([' ', '-'], '%', $keywords) . '%';
+        // Handle common job type variations
+        $lowerKeywords = strtolower($keywords);
         
-        $sql .= " AND (j.job_title LIKE ? OR j.description LIKE ? OR j.requirements LIKE ? OR LOWER(j.job_type) LIKE LOWER(?) OR j.categories LIKE ?)";
-        $types .= 'sssss';
-        $params = array_merge($params, ['%' . $keywords . '%', '%' . $keywords . '%', '%' . $keywords . '%', $keywordParam, '%' . $keywords . '%']);
+        // Check if the search is specifically for a job type
+        $jobTypeInfo = identifyJobTypeSearch($keywords);
+        
+        // If we have a job type search
+        if ($jobTypeInfo) {
+            $jobType = $jobTypeInfo['job_type'];
+            $isExactMatch = $jobTypeInfo['exact_match'];
+            
+            // Full-time and part-time need special handling to avoid overlap
+            if ($jobType === 'full-time') {
+                $sql .= " AND (
+                    /* Title, description, requirements match */
+                    (j.job_title LIKE ? OR j.description LIKE ? OR j.requirements LIKE ?) 
+                    OR 
+                    /* Exact job type match with exclusion of part-time */
+                    (
+                        (LOWER(j.job_type) = ? OR LOWER(j.job_type) = ?) AND
+                        LOWER(j.job_type) NOT LIKE ?
+                    )
+                    OR
+                    /* Contains full and time, but not part */
+                    (
+                        LOWER(j.job_type) LIKE ? AND
+                        LOWER(j.job_type) LIKE ? AND
+                        LOWER(j.job_type) NOT LIKE ?
+                    )
+                    OR
+                    /* Categories match */
+                    j.categories LIKE ?
+                )";
+                $types .= 'sssssssssss';
+                $params = array_merge(
+                    $params, 
+                    [
+                        '%' . $keywords . '%',                 // Title match
+                        '%' . $keywords . '%',                 // Description match 
+                        '%' . $keywords . '%',                 // Requirements match
+                        'full-time',                          // Exact job type match
+                        'full time',                          // Alternative job type format
+                        '%part%',                             // Exclude part-time
+                        '%full%',                             // Contains "full"
+                        '%time%',                             // Contains "time"
+                        '%part%',                             // Exclude part-time
+                        '%' . $keywords . '%'                 // Categories match
+                    ]
+                );
+            } 
+            else if ($jobType === 'part-time') {
+                $sql .= " AND (
+                    /* Title, description, requirements match */
+                    (j.job_title LIKE ? OR j.description LIKE ? OR j.requirements LIKE ?) 
+                    OR 
+                    /* Exact job type match with exclusion of full-time */
+                    (
+                        (LOWER(j.job_type) = ? OR LOWER(j.job_type) = ?) AND
+                        LOWER(j.job_type) NOT LIKE ?
+                    )
+                    OR
+                    /* Contains part and time, but not full */
+                    (
+                        LOWER(j.job_type) LIKE ? AND
+                        LOWER(j.job_type) LIKE ? AND
+                        LOWER(j.job_type) NOT LIKE ?
+                    )
+                    OR
+                    /* Categories match */
+                    j.categories LIKE ?
+                )";
+                $types .= 'sssssssssss';
+                $params = array_merge(
+                    $params, 
+                    [
+                        '%' . $keywords . '%',                 // Title match
+                        '%' . $keywords . '%',                 // Description match 
+                        '%' . $keywords . '%',                 // Requirements match
+                        'part-time',                          // Exact job type match
+                        'part time',                          // Alternative job type format
+                        '%full%',                             // Exclude full-time
+                        '%part%',                             // Contains "part"
+                        '%time%',                             // Contains "time"
+                        '%full%',                             // Exclude full-time
+                        '%' . $keywords . '%'                 // Categories match
+                    ]
+                );
+            }
+            // Remote needs to exclude onsite
+            else if ($jobType === 'remote' || $jobType === 'work from home') {
+                $sql .= " AND (
+                    /* Title, description, requirements match */
+                    (j.job_title LIKE ? OR j.description LIKE ? OR j.requirements LIKE ?) 
+                    OR 
+                    /* Exact job type match */
+                    (LOWER(j.job_type) = ? OR LOWER(j.job_type) = ?) 
+                    OR
+                    /* Categories match */
+                    j.categories LIKE ?
+                )";
+                $types .= 'ssssss';
+                $params = array_merge(
+                    $params, 
+                    [
+                        '%' . $keywords . '%',                 // Title match
+                        '%' . $keywords . '%',                 // Description match 
+                        '%' . $keywords . '%',                 // Requirements match
+                        'remote',                             // Exact job type match
+                        'work from home',                     // Alternative job type format
+                        '%' . $keywords . '%'                 // Categories match
+                    ]
+                );
+            }
+            // Standard job type search for others
+            else {
+                $sql .= " AND (
+                    /* Title, description, requirements match */
+                    j.job_title LIKE ? OR 
+                    j.description LIKE ? OR 
+                    j.requirements LIKE ? OR
+                    /* Exact job type match */
+                    LOWER(j.job_type) = ? OR
+                    /* Categories match */
+                    j.categories LIKE ?
+                )";
+                $types .= 'sssss';
+                $params = array_merge(
+                    $params, 
+                    [
+                        '%' . $keywords . '%',                // Title match
+                        '%' . $keywords . '%',                // Description match 
+                        '%' . $keywords . '%',                // Requirements match
+                        $jobType,                            // Exact job type match
+                        '%' . $keywords . '%'                // Categories match
+                    ]
+                );
+            }
+        } 
+        // General search (not specific to job type)
+        else {
+            // Build comprehensive job type patterns for general search
+            $jobTypePatterns = [];
+            $jobTypeParams = [];
+            
+            // Standard keyword search
+            $jobTypePatterns[] = "j.job_title LIKE ?";
+            $jobTypePatterns[] = "j.description LIKE ?";
+            $jobTypePatterns[] = "j.requirements LIKE ?";
+            $jobTypePatterns[] = "j.categories LIKE ?";
+            $jobTypeParams[] = '%' . $keywords . '%';
+            $jobTypeParams[] = '%' . $keywords . '%';
+            $jobTypeParams[] = '%' . $keywords . '%';
+            $jobTypeParams[] = '%' . $keywords . '%';
+            
+            // Only include job type searching if keywords is long enough 
+            // or contains specific job-related terms
+            $jobTypeTerms = ['job', 'work', 'career', 'position', 'employment', 'time', 'remote', 'onsite', 'site', 'hybrid'];
+            $containsJobTerm = false;
+            
+            foreach ($jobTypeTerms as $term) {
+                if (stripos($keywords, $term) !== false) {
+                    $containsJobTerm = true;
+                    break;
+                }
+            }
+            
+            if (strlen($keywords) > 3 || $containsJobTerm) {
+                // Normalized with wildcards
+                $normalizedKeyword = str_replace([' ', '-'], '%', $keywords);
+                $keywordParam = '%' . $normalizedKeyword . '%';
+                
+                // Pattern 1: Direct match
+                $jobTypePatterns[] = "LOWER(j.job_type) LIKE LOWER(?)";
+                $jobTypeParams[] = '%' . $keywords . '%';
+                
+                // Pattern 2: Normalized with wildcards - only for multi-word searches
+                if (strpos($keywords, ' ') !== false || strpos($keywords, '-') !== false) {
+                    $jobTypePatterns[] = "LOWER(j.job_type) LIKE LOWER(?)";
+                    $jobTypeParams[] = $keywordParam;
+                    
+                    // Pattern 3: Replace hyphens with spaces
+                    $jobTypePatterns[] = "REPLACE(LOWER(j.job_type), '-', ' ') LIKE LOWER(?)";
+                    $jobTypeParams[] = '%' . str_replace('-', ' ', $keywords) . '%';
+                    
+                    // Pattern 4: Remove spaces and hyphens - only for specific job type terms
+                    if (strlen($keywords) > 4) {
+                        $jobTypePatterns[] = "REPLACE(LOWER(j.job_type), '-', '') LIKE REPLACE(LOWER(?), ' ', '')";
+                        $jobTypeParams[] = '%' . str_replace(' ', '', $keywords) . '%';
+                    }
+                }
+            }
+            
+            // Combine all patterns
+            $sql .= " AND (" . implode(" OR ", $jobTypePatterns) . ")";
+            $types .= str_repeat('s', count($jobTypeParams));
+            $params = array_merge($params, $jobTypeParams);
+        }
     }
     
     // Add location search
@@ -557,11 +832,23 @@ function searchJobs($keywords = '', $location = '', $jobTypes = [], $categories 
         $jobTypeConditions = [];
         foreach ($jobTypes as $type) {
             // Make job type matching case-insensitive and allow fuzzy/partial matching
-            // Convert spaces to allow matching "Full-time" with "full time" etc.
+            // Convert spaces/hyphens to allow flexible matching
             $cleanType = str_replace([' ', '-'], '%', $type);
+            
+            // Multiple ways to match job types
             $jobTypeConditions[] = "LOWER(j.job_type) LIKE LOWER(?)";
             $types .= 's';
             $params[] = '%' . $cleanType . '%';
+            
+            // Also match when spaces and hyphens are different
+            $jobTypeConditions[] = "REPLACE(LOWER(j.job_type), '-', '') LIKE REPLACE(LOWER(?), ' ', '')";
+            $types .= 's';
+            $params[] = '%' . str_replace(' ', '', $type) . '%';
+            
+            // Direct equality match
+            $jobTypeConditions[] = "LOWER(j.job_type) = LOWER(?)";
+            $types .= 's';
+            $params[] = $type;
         }
         $sql .= " AND (" . implode(" OR ", $jobTypeConditions) . ")";
     }
@@ -901,18 +1188,44 @@ function calculateCultureFitScore($userId, $companyId) {
     $mismatches = [];
     $matchCount = 0;
     
-    // Compare each value
-    foreach ($userValues as $key => $value) {
-        if (isset($companyValues[$key]) && $companyValues[$key] == $value) {
-            $matches[] = $key;
+    // Debug log to see the actual data formats
+    error_log("User culture values: " . json_encode($userValues));
+    error_log("Company culture values: " . json_encode($companyValues));
+    
+    // Compare each user value with company values
+    foreach ($userValues as $userAttribute => $userValue) {
+        $matched = false;
+        
+        // User data format: $userAttribute may be something like "collaborative" 
+        // and $userValue is also "collaborative"
+        // Company data format: key is attribute name like "work_environment" and value is "collaborative"
+        
+        // Method 1: Direct match if company has the same attribute-value pair
+        if (isset($companyValues[$userAttribute]) && $companyValues[$userAttribute] == $userValue) {
+            $matches[] = $userAttribute;
             $matchCount++;
-        } else if (isset($companyValues[$key])) {
-            $mismatches[] = $key;
+            $matched = true;
+        } 
+        // Method 2: Check if the user's attribute name is a value in any of the company's attributes
+        else {
+            foreach ($companyValues as $companyAttribute => $companyValue) {
+                // If either the attribute name or value from user matches company's value
+                if ($userAttribute == $companyValue || $userValue == $companyValue) {
+                    $matches[] = $companyAttribute;
+                    $matchCount++;
+                    $matched = true;
+                    break;
+                }
+            }
+        }
+        
+        if (!$matched && isset($companyValues[$userAttribute])) {
+            $mismatches[] = $userAttribute;
         }
     }
     
-    $totalValues = count(array_unique(array_merge(array_keys($userValues), array_keys($companyValues))));
-    $score = ($totalValues > 0) ? round(($matchCount / $totalValues) * 100) : 0;
+    // New scoring system: 10 points per match, max 100 points
+    $score = min(100, $matchCount * 10);
     
     return [
         'score' => $score,
@@ -926,31 +1239,118 @@ function calculateCultureFitScore($userId, $companyId) {
  * 
  * @param int $userId The user ID
  * @param int $limit The maximum number of companies to return
+ * @param bool $includeAll Whether to include all companies even without a match score
  * @return array Array of companies with match scores
  */
-function getMatchingCompanies($userId, $limit = 5) {
-    $companies = fetchAll("SELECT c.*, u.username FROM companies c JOIN users u ON c.user_id = u.user_id WHERE c.company_culture IS NOT NULL");
+function getMatchingCompanies($userId, $limit = 10, $includeAll = false) {
+    $companies = fetchAll("SELECT c.*, u.username FROM companies c JOIN users u ON c.user_id = u.user_id");
     $matches = [];
+    $nonMatches = [];
+    
+    // Get user culture profile
+    $userCulture = getUserCultureResults($userId);
     
     foreach ($companies as $company) {
+        // Calculate match score
         $matchData = calculateCultureFitScore($userId, $company['company_id']);
         
-        // Only include if there is some match
+        // Add match score to company data
+        $company['match_score'] = $matchData['score'];
+        $company['matches'] = $matchData['matches'];
+        $company['mismatches'] = $matchData['mismatches'];
+        
+        // If company has a match score or includeAll is true
         if ($matchData['score'] > 0) {
-            $company['match_score'] = $matchData['score'];
-            $company['matches'] = $matchData['matches'];
-            $company['mismatches'] = $matchData['mismatches'];
             $matches[] = $company;
+        } else {
+            // For companies without culture data or zero match score
+            // Calculate proximity score (lower is better)
+            $proximityScore = calculateProximityScore($userCulture, $company);
+            $company['proximity_score'] = $proximityScore;
+            $nonMatches[] = $company;
         }
     }
     
-    // Sort by match score
+    // Sort matched companies by match score
     usort($matches, function($a, $b) {
         return $b['match_score'] - $a['match_score'];
     });
     
-    // Limit results
-    return array_slice($matches, 0, $limit);
+    // Sort non-matched companies by proximity score
+    usort($nonMatches, function($a, $b) {
+        return $a['proximity_score'] - $b['proximity_score'];
+    });
+    
+    // Combine matches and non-matches with matches first
+    $allCompanies = array_merge($matches, $nonMatches);
+    
+    // If we need to include all companies
+    if ($includeAll) {
+        // Ensure we return at least $limit companies total
+        return array_slice($allCompanies, 0, $limit);
+    } else {
+        // Return only matched companies
+        return array_slice($matches, 0, $limit);
+    }
+}
+
+/**
+ * Calculate proximity score for companies without explicit culture match
+ * Lower score means closer to the user's preferences
+ * 
+ * @param array|null $userCulture The user's culture profile
+ * @param array $company The company data
+ * @return int Proximity score (lower is better)
+ */
+function calculateProximityScore($userCulture, $company) {
+    // Default high score (lower is better)
+    $baseScore = 100;
+    
+    // If no user culture data, return base score
+    if (!$userCulture) return $baseScore;
+    
+    $score = $baseScore;
+    
+    // Improve score for companies with culture data (even if no match)
+    if (!empty($company['company_culture'])) {
+        $score -= 20;
+    }
+    
+    // Improve score for verified companies
+    if (isset($company['license_status']) && $company['license_status'] === 'Approved') {
+        $score -= 10;
+    }
+    
+    // Improve score for companies with recent job postings
+    $recentJobs = fetchRow(
+        "SELECT COUNT(*) as count FROM jobs 
+         WHERE company_id = ? AND posted_date > DATE_SUB(NOW(), INTERVAL 30 DAY)",
+        'i',
+        [$company['company_id']]
+    );
+    
+    if ($recentJobs && $recentJobs['count'] > 0) {
+        $score -= min(15, $recentJobs['count'] * 3); // Max 15 points reduction
+    }
+    
+    // Improve score based on application count (popular companies)
+    $applications = fetchRow(
+        "SELECT COUNT(DISTINCT a.user_id) as count 
+         FROM applications a 
+         JOIN jobs j ON a.job_id = j.job_id 
+         WHERE j.company_id = ?",
+        'i',
+        [$company['company_id']]
+    );
+    
+    if ($applications && $applications['count'] > 0) {
+        $score -= min(15, sqrt($applications['count']) * 3); // Max 15 points reduction
+    }
+    
+    // Randomize slightly to avoid ties and provide variety
+    $score += mt_rand(-5, 5);
+    
+    return max(0, $score);
 }
 
 /**

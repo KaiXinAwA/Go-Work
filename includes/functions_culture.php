@@ -90,18 +90,44 @@ function enhancedCalculateCultureFitScore($userId, $companyId) {
     $mismatches = [];
     $matchCount = 0;
     
-    // First, try direct matching of values
-    foreach ($userValues as $key => $value) {
-        if (isset($companyValues[$key]) && $companyValues[$key] == $value) {
-            $matches[] = $key;
+    // Debug log to see the actual data formats
+    error_log("Enhanced - User culture values: " . json_encode($userValues));
+    error_log("Enhanced - Company culture values: " . json_encode($companyValues));
+    
+    // Compare each user value with company values
+    foreach ($userValues as $userAttribute => $userValue) {
+        $matched = false;
+        
+        // User data format: $userAttribute may be something like "collaborative" 
+        // and $userValue is also "collaborative"
+        // Company data format: key is attribute name like "work_environment" and value is "collaborative"
+        
+        // Method 1: Direct match if company has the same attribute-value pair
+        if (isset($companyValues[$userAttribute]) && $companyValues[$userAttribute] == $userValue) {
+            $matches[] = $userAttribute;
             $matchCount++;
-        } else if (isset($companyValues[$key])) {
-            $mismatches[] = $key;
+            $matched = true;
+        } 
+        // Method 2: Check if the user's attribute name is a value in any of the company's attributes
+        else {
+            foreach ($companyValues as $companyAttribute => $companyValue) {
+                // If either the attribute name or value from user matches company's value
+                if ($userAttribute == $companyValue || $userValue == $companyValue) {
+                    $matches[] = $companyAttribute;
+                    $matchCount++;
+                    $matched = true;
+                    break;
+                }
+            }
+        }
+        
+        if (!$matched && isset($companyValues[$userAttribute])) {
+            $mismatches[] = $userAttribute;
         }
     }
     
-    $totalValues = count(array_unique(array_merge(array_keys($userValues), array_keys($companyValues))));
-    $score = ($totalValues > 0) ? round(($matchCount / $totalValues) * 100) : 0;
+    // New scoring system: 10 points per match, max 100 points
+    $score = min(100, $matchCount * 10);
     
     return [
         'score' => $score,

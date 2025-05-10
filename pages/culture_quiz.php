@@ -152,10 +152,15 @@ if ($isLoggedIn) {
                         </div>
                     </div>
                 <?php endforeach; ?>
+                
+                <div class="col-12 mt-3 text-center">
+                    <a href="<?php echo SITE_URL; ?>/pages/culture_match.php" class="btn quiz-btn-black">View All Companies</a>
+                </div>
             </div>
         <?php else: ?>
             <div class="alert alert-info mb-4">
                 <p>No companies currently match your culture profile. Check back later as more companies add their cultural information.</p>
+                <a href="<?php echo SITE_URL; ?>/pages/culture_match.php" class="btn quiz-btn-black mt-2">View All Companies</a>
             </div>
         <?php endif; ?>
     <?php endif; ?>
@@ -316,8 +321,17 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             updateProgressBar(1);
             
-            // Hide results section
-            document.querySelector('.row.mb-5').style.display = 'none';
+            // Hide results section and matching companies section
+            document.querySelectorAll('.row.mb-5').forEach(row => {
+                row.style.display = 'none';
+            });
+            
+            // Hide no-matches message if it exists
+            const noMatchesMessage = document.querySelector('.alert.alert-info.mb-4');
+            if (noMatchesMessage) {
+                noMatchesMessage.style.display = 'none';
+            }
+            
             quizContainer.style.display = 'block';
         });
     }

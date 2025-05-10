@@ -54,6 +54,30 @@
             const keywordsValue = keywordsInput.value.toLowerCase().trim();
             const locationValue = locationInput.value.toLowerCase().trim();
             
+            // Debug logging
+            console.log("Search keywords:", keywordsValue);
+            
+            // Normalize keywords for job type matching
+            // This will help match "part time" with "Part-time" and similar variations
+            const normalizedKeywords = keywordsValue
+                .replace(/part[ -]*time/gi, "part-time")
+                .replace(/full[ -]*time/gi, "full-time")
+                .replace(/work[ -]*from[ -]*home/gi, "work from home")
+                .replace(/on[ -]*site/gi, "on-site")
+                .replace(/night[ -]*shift/gi, "night shift")
+                .replace(/per[ -]*diem/gi, "per diem")
+                .replace(/entry[ -]*level/gi, "entry-level")
+                .replace(/commission[ -]*based/gi, "commission-based")
+                .replace(/tenure[ -]*track/gi, "tenure-track")
+                .replace(/locum[ -]*tenens/gi, "locum tenens")
+                .replace(/performing[ -]*artist/gi, "performing artist")
+                .replace(/travel[ -]*nursing/gi, "travel nursing");
+            
+            // Debug logging
+            if (normalizedKeywords !== keywordsValue) {
+                console.log("Normalized keywords:", normalizedKeywords);
+            }
+            
             // Get elements for filter display
             const activeFiltersContainer = document.querySelector('.active-search-filters');
             const keywordFilterBadge = document.querySelector('.keyword-filter');
@@ -86,6 +110,105 @@
                 }
             }
             
+            // Helper function to normalize job type strings by removing spaces and hyphens
+            function normalizeJobType(jobType) {
+                // First handle specific job types with multiple words/hyphens
+                let normalized = jobType.toLowerCase()
+                    .replace(/part[ -]*time/gi, "parttime")
+                    .replace(/full[ -]*time/gi, "fulltime")
+                    .replace(/work[ -]*from[ -]*home/gi, "workfromhome")
+                    .replace(/on[ -]*site/gi, "onsite")
+                    .replace(/night[ -]*shift/gi, "nightshift")
+                    .replace(/per[ -]*diem/gi, "perdiem")
+                    .replace(/entry[ -]*level/gi, "entrylevel")
+                    .replace(/commission[ -]*based/gi, "commissionbased")
+                    .replace(/tenure[ -]*track/gi, "tenuretrack")
+                    .replace(/locum[ -]*tenens/gi, "locumtenens")
+                    .replace(/performing[ -]*artist/gi, "performingartist")
+                    .replace(/travel[ -]*nursing/gi, "travelnursing");
+                    
+                // Then remove all remaining spaces and hyphens
+                return normalized.replace(/[- ]/g, '');
+            }
+            
+            // Helper function for phrase matching with negative term scoring
+            function scoreJobTypeMatch(searchTerm, jobType) {
+                if (!searchTerm || !jobType) return 0;
+                
+                const search = searchTerm.toLowerCase();
+                const job = jobType.toLowerCase();
+                
+                // Direct equality - highest score (10)
+                if (job === search) return 10;
+                
+                // Normalized equality - high score (9)
+                if (normalizeJobType(job) === normalizeJobType(search)) return 9;
+                
+                // Handle specific job type matches to avoid overlapping terms
+                
+                // Check for part-time related searches
+                if (search.includes('part') && search.includes('time')) {
+                    // Positive match for part-time
+                    if (job.includes('part') && job.includes('time')) return 8;
+                    // Negative match for full-time
+                    if (job.includes('full') && job.includes('time')) return -5;
+                }
+                
+                // Check for full-time related searches
+                if (search.includes('full') && search.includes('time')) {
+                    // Positive match for full-time
+                    if (job.includes('full') && job.includes('time')) return 8;
+                    // Negative match for part-time
+                    if (job.includes('part') && job.includes('time')) return -5;
+                }
+                
+                // Check for remote/work from home searches
+                if ((search.includes('remote') || (search.includes('work') && search.includes('home')))) {
+                    // Positive match for remote work
+                    if (job.includes('remote') || (job.includes('work') && job.includes('home'))) return 8;
+                    // Negative match for on-site
+                    if (job.includes('on') && (job.includes('site') || job.includes('location'))) return -3;
+                }
+                
+                // Check for on-site searches
+                if (search.includes('on') && search.includes('site')) {
+                    // Positive match for on-site
+                    if (job.includes('on') && job.includes('site')) return 8;
+                    // Negative match for remote
+                    if (job.includes('remote') || (job.includes('work') && job.includes('home'))) return -3;
+                }
+                
+                // For other cases, do substring matching but with context awareness
+                if (job.includes(search)) {
+                    // If the search term is part of the job type, give a moderate score
+                    return 6;
+                }
+                
+                // Check individual terms (with at least 3 chars)
+                const searchTerms = search.split(/[ -]+/).filter(t => t.length >= 3);
+                const jobTerms = job.split(/[ -]+/);
+                
+                let termMatches = 0;
+                for (const term of searchTerms) {
+                    if (jobTerms.includes(term)) {
+                        termMatches++;
+                    }
+                }
+                
+                // If all search terms match job terms, good score
+                if (termMatches === searchTerms.length && searchTerms.length > 0) {
+                    return 5;
+                }
+                
+                // If some terms match, lower score
+                if (termMatches > 0) {
+                    return 3;
+                }
+                
+                // No match
+                return 0;
+            }
+            
             // For each job card, check if it matches the filters
             let visibleCount = 0;
             
@@ -95,14 +218,55 @@
                     const jobDetails = card.querySelectorAll('.job-detail');
                     const jobLocation = jobDetails.length > 0 ? jobDetails[0].textContent.toLowerCase() : '';
                     
-                    // Simple matching for search bar filters only
-                    const matchesKeyword = keywordsValue === '' || cardText.includes(keywordsValue);
+                    // Special handling for job type - extract job type from the second job-detail
+                    let jobType = '';
+                    if (jobDetails.length > 1) {
+                        jobType = jobDetails[1].textContent.toLowerCase().trim();
+                        
+                        // Debug log found job type
+                        if (keywordsValue && keywordsValue.length > 2) {
+                            console.log("Card job type:", jobType);
+                        }
+                    }
+                    
+                    // Check for normalized keywords match or regular keywords match
+                    const matchesKeyword = 
+                        keywordsValue === '' || 
+                        (keywordsValue.length > 2 && (
+                            cardText.includes(keywordsValue) || 
+                            (normalizedKeywords !== keywordsValue && cardText.includes(normalizedKeywords))
+                        ));
+                        
+                    // Special case for job type matching using scoring system
+                    let matchesJobType = false;
+                    let jobTypeScore = 0;
+                    
+                    if (keywordsValue === '') {
+                        matchesJobType = true;
+                    } else if (jobType !== '' && keywordsValue.length > 2) {
+                        // Calculate match score
+                        jobTypeScore = scoreJobTypeMatch(keywordsValue, jobType);
+                        
+                        // Consider it a match if the score is positive
+                        if (jobTypeScore > 0) {
+                            matchesJobType = true;
+                            console.log(`✓ Job type match with score: ${jobTypeScore} for "${jobType}"`);
+                        } else if (jobTypeScore < 0) {
+                            console.log(`✗ Negative match score: ${jobTypeScore} for "${jobType}"`);
+                        }
+                    }
+                    
                     const matchesLocation = locationValue === '' || jobLocation.includes(locationValue);
                     
                     // Show/hide based on search filters only
-                    if (matchesKeyword && matchesLocation) {
+                    if ((matchesKeyword || matchesJobType) && matchesLocation) {
                         card.style.display = '';
                         visibleCount++;
+                        
+                        // Log match reason for debugging
+                        if (keywordsValue.length > 2 && matchesJobType) {
+                            console.log(`Match found for card with job type: ${jobType} (Score: ${jobTypeScore})`);
+                        }
                     } else {
                         card.style.display = 'none';
                     }
