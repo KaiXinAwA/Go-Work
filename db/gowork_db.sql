@@ -1,3 +1,12 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- 主机： localhost
+-- 生成日期： 2025-05-11 10:13:53
+-- 服务器版本： 10.4.28-MariaDB
+-- PHP 版本： 8.2.4
+
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
@@ -55,7 +64,10 @@ CREATE TABLE `applications` (
 
 INSERT INTO `applications` (`application_id`, `job_id`, `user_id`, `applied_date`, `status`, `resume_path`, `is_hidden_from_user`, `created_at`) VALUES
 (6, 6, 2, '2025-04-27 12:33:41', 'Viewed', '67e95c25ca53c_Boarding Pass.pdf', 0, '2025-04-27 12:33:41'),
-(7, 7, 6, '2025-05-04 13:56:12', 'Shortlisted', '681767bb9649d_database_lab5.pdf', 0, '2025-05-04 13:56:12');
+(7, 7, 6, '2025-05-04 13:56:12', 'Shortlisted', '681767bb9649d_database_lab5.pdf', 0, '2025-05-04 13:56:12'),
+(8, 7, 16, '2025-05-10 03:53:16', 'Shortlisted', NULL, 0, '2025-05-07 13:09:06'),
+(9, 7, 17, '2025-05-10 16:12:56', 'Rejected', '681f7adfc5a15_lab 3.pdf', 0, '2025-05-10 16:12:56'),
+(10, 6, 17, '2025-05-10 16:13:04', 'Pending', '681f7adfc5a15_lab 3.pdf', 0, '2025-05-10 16:13:04');
 
 -- --------------------------------------------------------
 
@@ -140,7 +152,8 @@ CREATE TABLE `career_history` (
 
 INSERT INTO `career_history` (`career_id`, `user_id`, `job_title`, `company_name`, `start_date`, `end_date`, `description`, `created_at`, `updated_at`) VALUES
 (2, 6, 'wqq', 'eee', '2025-03-13', '2025-04-10', 'qwq', '2025-04-13 08:01:58', '2025-04-13 08:01:58'),
-(3, 6, 'dsad', 'asdad', '2025-04-12', '2025-04-06', 'adad', '2025-04-13 09:31:02', '2025-04-13 09:31:02');
+(3, 6, 'dsad', 'asdad', '2025-04-12', '2025-04-06', 'adad', '2025-04-13 09:31:02', '2025-04-13 09:31:02'),
+(5, 17, 'Programming', 'Sunlight Sdn.Bhd', '2025-01-11', '2025-04-11', 'Sweeping, mopping, serve customers', '2025-05-10 16:09:58', '2025-05-10 16:09:58');
 
 --
 -- 触发器 `career_history`
@@ -192,10 +205,7 @@ CREATE TABLE `companies` (
 
 INSERT INTO `companies` (`company_id`, `user_id`, `company_name`, `description`, `company_culture`, `contact_number`, `address`, `city`, `state`, `country`, `license_path`, `license_status`, `created_at`, `updated_at`) VALUES
 (1, 3, 'Sunlight', 'GoGoGo~', '{\"values\":{\"work_environment\":\"collaborative\",\"overtime\":\"structured\",\"management\":\"autonomous\",\"work_life_balance\":\"flexible\",\"dress_code\":\"traditional\",\"communication\":\"formal\",\"decision_making\":\"analytical\",\"innovation\":\"innovative\",\"social_events\":\"energetic\",\"feedback\":\"considerate\"},\"description\":\"describe settingsss\"}', '099-9999099', 'No2, Jalan University', 'Sibu', 'Sarawak', 'Malaysia', '67e959e8555c6_Boarding Pass.pdf', 'Approved', '2025-03-30 14:40:01', '2025-05-04 13:21:49'),
-(3, 12, 'ASDA', 'SADA', NULL, NULL, NULL, NULL, NULL, NULL, '680e235db8a8e_Lab3.pdf', 'Approved', '2025-04-27 12:29:49', '2025-04-27 12:31:41'),
-(4, 13, 'Starlight', 'Good Company', NULL, NULL, NULL, NULL, NULL, NULL, '68176fc7ec810_database_lab5.pdf', 'Approved', '2025-05-04 13:41:13', '2025-05-04 13:48:49'),
-(5, 14, 'Moonlight', 'Good Company', NULL, NULL, NULL, NULL, NULL, NULL, '68177bb501d0d_database_lab5.pdf', 'Not Approved', '2025-05-04 14:36:27', '2025-05-04 14:38:21'),
-(6, 15, 'Moon', 'Good Company', NULL, NULL, NULL, NULL, NULL, NULL, '68177dbc315c9_dsa c1.pdf', 'Pending', '2025-05-04 14:39:43', '2025-05-04 14:46:20');
+(4, 13, 'Starlight', 'Good Company', '{\"values\":{\"work_environment\":\"collaborative\",\"overtime\":\"structured\",\"management\":\"autonomous\",\"work_life_balance\":\"flexible\",\"dress_code\":\"traditional\",\"communication\":\"formal\",\"decision_making\":\"collaborative\",\"innovation\":\"innovative\",\"social_events\":\"energetic\",\"feedback\":\"direct\"},\"description\":\"Good\"}', NULL, NULL, NULL, NULL, NULL, '68176fc7ec810_database_lab5.pdf', 'Approved', '2025-05-04 13:41:13', '2025-05-10 14:42:01');
 
 -- --------------------------------------------------------
 
@@ -357,7 +367,8 @@ CREATE TABLE `password_resets` (
 --
 
 INSERT INTO `password_resets` (`id`, `email`, `token`, `created_at`) VALUES
-(10, 'xiaoying171158@gmail.com', '431fe8b4be5b81ec4354750422d876846dc4bcf40781779a916af99bd225391a', '2025-05-04 06:55:11');
+(13, 'xiaoying171158@gmail.com', '91bac0cbddf542746d9595e1379aa9aab5ca87ffa0f73f187fe310e36e84ff55', '2025-05-10 10:18:48'),
+(15, 'jiaying090105@gmail.com', '051e4017b252bb1a701325f9b9fbb38e21c4a205d45140cd2da269b051d140ac', '2025-05-10 10:20:00');
 
 -- --------------------------------------------------------
 
@@ -384,12 +395,11 @@ INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `profile_pictur
 (1, 'admin', 'admin@gmail.com', '$2y$10$llRRhU71gXHqDOJPa6noh.NToPORuZx4seVqUJ88SSY12av/oKI7y', NULL, 4, '2025-03-30 14:36:04', '2025-03-31 01:35:05'),
 (2, 'user', 'user@gmail.com', '$2y$10$llRRhU71gXHqDOJPa6noh.NToPORuZx4seVqUJ88SSY12av/oKI7y', NULL, 1, '2025-03-30 14:37:13', '2025-03-31 01:57:25'),
 (3, 'company', 'company@gmail.com', '$2y$10$llRRhU71gXHqDOJPa6noh.NToPORuZx4seVqUJ88SSY12av/oKI7y', '67e96039d6af7_palm-tree.png', 2, '2025-03-30 14:40:01', '2025-03-31 01:57:31'),
-(6, 'Hi', 'xiaoying171158@gmail.com', '$2y$10$idoony8fAEUI6dxPFlZHCOSoI1KQIeHb6OGV3r2c47/wB0jP2BPla', '67fb7159aec01_WechatIMG1.jpeg', 1, '2025-04-13 04:48:29', '2025-05-04 12:55:11'),
+(6, 'Hi', 'xiaoying171158@gmail.com', '$2y$10$cCm4UfDEN/r44t5Yx0UuKu/uCICVF7frSh52TXkYqakxjgJBPFsGC', '67fb7159aec01_WechatIMG1.jpeg', 1, '2025-04-13 04:48:29', '2025-05-10 16:18:48'),
 (11, 'rrrr', 'worker@gmail.com', '$2y$10$IzJLxfU.3rlnRMdU9m/9ieky3x3Cz/8y7zNjbfBDp4PrBwdHromDm', NULL, 3, '2025-04-27 02:40:57', '2025-05-04 10:33:04'),
-(12, 'asSsat', 'company2@gmail.com', '$2y$10$yYY44Y6AtZ4PvWtQZ1pUreOWepNNV.v2Qt5PvMIMKEcY/L.VudjBW', NULL, 2, '2025-04-27 12:29:49', '2025-05-04 11:16:01'),
 (13, 'Starlight', 'company3@gmail.com', '$2y$10$u/Pi2XHHSPm.bJoQtlPHieg1mCAHi5JcZneyublz.AkQU4p9LeSv.', NULL, 2, '2025-05-04 13:41:13', '2025-05-04 13:41:13'),
-(14, 'Moonlight', 'company4@gmail.com', '$2y$10$n92PrhZPM1SREFgMEezJx.1pssALeUz4S/g0FKZlbA7cI97.voW6C', NULL, 2, '2025-05-04 14:36:27', '2025-05-04 14:36:27'),
-(15, 'Moon', 'company5@gmail.com', '$2y$10$AeVfLa1Gj4H1SYUOjKh9ZulJU7XDf49j7/WvQ3fYZ/cNilL6e50WO', NULL, 2, '2025-05-04 14:39:43', '2025-05-04 14:39:43');
+(16, 'testyeah', 'testuser@gmail.com', '$2y$10$cbwUYk7w6p.AOHBgPt2rY.7RTLr9pchfOgpYoD9/AqovaZMBLe1IK', '681b5b5840c2c_herta.jpg', 1, '2025-05-07 10:11:06', '2025-05-10 16:28:05'),
+(17, 'JiaYing', 'jiaying090105@gmail.com', '$2y$10$w6PopnD0NWCtmr30MLfn4uMfdLNmdeMV7B5FPglCoTqmlpDU.VC6m', NULL, 1, '2025-05-10 14:11:23', '2025-05-10 16:20:00');
 
 -- --------------------------------------------------------
 
@@ -411,7 +421,9 @@ CREATE TABLE `user_culture_results` (
 
 INSERT INTO `user_culture_results` (`result_id`, `user_id`, `culture_profile`, `created_at`, `updated_at`) VALUES
 (1, 2, '{\"options\":{\"1\":\"2\",\"2\":\"5\",\"3\":\"10\",\"4\":\"13\",\"5\":\"18\",\"6\":\"21\",\"7\":\"25\",\"8\":\"30\",\"9\":\"34\",\"10\":\"39\"},\"values\":{\"focused\":\"focused\",\"dedicated\":\"dedicated\",\"structured\":\"structured\",\"balanced\":\"balanced\",\"moderate\":\"moderate\",\"direct\":\"direct\",\"agile\":\"agile\",\"professional\":\"professional\",\"reflective\":\"reflective\"}}', '2025-04-27 11:39:04', '2025-05-04 07:42:34'),
-(2, 3, '{\"options\":{\"1\":\"1\",\"2\":\"5\",\"3\":\"9\",\"4\":\"13\",\"5\":\"17\",\"6\":\"21\",\"7\":\"25\",\"8\":\"29\",\"9\":\"33\",\"10\":\"37\"},\"values\":{\"collaborative\":\"collaborative\",\"dedicated\":\"dedicated\",\"autonomous\":\"autonomous\",\"balanced\":\"balanced\",\"traditional\":\"traditional\",\"direct\":\"direct\",\"agile\":\"agile\",\"innovative\":\"innovative\",\"energetic\":\"energetic\"}}', '2025-04-27 12:25:53', '2025-05-04 07:42:34');
+(2, 3, '{\"options\":{\"1\":\"1\",\"2\":\"5\",\"3\":\"9\",\"4\":\"13\",\"5\":\"17\",\"6\":\"21\",\"7\":\"25\",\"8\":\"29\",\"9\":\"33\",\"10\":\"37\"},\"values\":{\"collaborative\":\"collaborative\",\"dedicated\":\"dedicated\",\"autonomous\":\"autonomous\",\"balanced\":\"balanced\",\"traditional\":\"traditional\",\"direct\":\"direct\",\"agile\":\"agile\",\"innovative\":\"innovative\",\"energetic\":\"energetic\"}}', '2025-04-27 12:25:53', '2025-05-04 07:42:34'),
+(3, 16, '{\"options\":{\"1\":\"1\",\"2\":\"5\",\"3\":\"9\",\"4\":\"13\",\"5\":\"17\",\"6\":\"22\",\"7\":\"25\",\"8\":\"29\",\"9\":\"33\",\"10\":\"37\"},\"values\":{\"collaborative\":\"collaborative\",\"dedicated\":\"dedicated\",\"autonomous\":\"autonomous\",\"balanced\":\"balanced\",\"traditional\":\"traditional\",\"formal\":\"formal\",\"agile\":\"agile\",\"innovative\":\"innovative\",\"energetic\":\"energetic\",\"direct\":\"direct\"}}', '2025-05-07 10:31:30', '2025-05-07 10:31:30'),
+(4, 17, '{\"options\":{\"1\":\"1\",\"2\":\"5\",\"3\":\"9\",\"4\":\"13\",\"5\":\"17\",\"6\":\"22\",\"7\":\"25\",\"8\":\"29\",\"9\":\"33\",\"10\":\"37\"},\"values\":{\"collaborative\":\"collaborative\",\"dedicated\":\"dedicated\",\"autonomous\":\"autonomous\",\"balanced\":\"balanced\",\"traditional\":\"traditional\",\"formal\":\"formal\",\"agile\":\"agile\",\"innovative\":\"innovative\",\"energetic\":\"energetic\",\"direct\":\"direct\"}}', '2025-05-10 14:17:13', '2025-05-10 15:09:41');
 
 -- --------------------------------------------------------
 
@@ -445,7 +457,8 @@ INSERT INTO `user_profiles` (`profile_id`, `user_id`, `full_name`, `phone`, `add
 (1, 2, 'JiaYing', '1111111', '11', '11', '11', '11', '67e95c25ca53c_Boarding Pass.pdf', '11', NULL, NULL, NULL, NULL, '2025-03-30 15:45:43'),
 (4, 6, 'MaryLa', '087-8787877', 'No1, Jalan University', 'Sibu', 'Sarawak', 'Malaysia', '681767bb9649d_database_lab5.pdf', 'eqwewe', 'qeqe', 'In Progress', 'qeweq', 'Programming', '2025-05-04 14:34:30'),
 (9, 11, 'addasd', '123', '11', '11', '11', '111', NULL, NULL, NULL, NULL, NULL, NULL, '2025-04-27 02:40:57'),
-(10, 12, '', '', '', '', '', '', NULL, NULL, NULL, NULL, NULL, NULL, '2025-05-04 10:33:38');
+(11, 16, 'Night', '087-8787867', 'No1, Jalan University', 'Sibu', 'Sarawak', 'Malaysia', '681b36f1cdfc8_lab 3.pdf', 'Bachelor of Computer Science', 'University of Technology Sarawak', 'In Progress', 'Learn to code in C++ and C languages', 'Good in coding', '2025-05-07 13:04:10'),
+(12, 17, 'JiaYing', '087-8787866', 'No3, Jalan University2', 'Sibu', 'Sarawak', 'Malaysia', '681f7adfc5a15_lab 3.pdf', 'Bachelor of Computer Science', 'University of Technology Sarawak', 'In Progress', 'Learn coding', 'Good Coding, yeah', '2025-05-10 16:27:13');
 
 --
 -- 转储表的索引
@@ -568,7 +581,7 @@ ALTER TABLE `admin`
 -- 使用表AUTO_INCREMENT `applications`
 --
 ALTER TABLE `applications`
-  MODIFY `application_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `application_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- 使用表AUTO_INCREMENT `backup_career_history`
@@ -586,7 +599,7 @@ ALTER TABLE `backup_user_profiles`
 -- 使用表AUTO_INCREMENT `career_history`
 --
 ALTER TABLE `career_history`
-  MODIFY `career_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `career_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- 使用表AUTO_INCREMENT `companies`
@@ -616,31 +629,31 @@ ALTER TABLE `gowork_workers`
 -- 使用表AUTO_INCREMENT `jobs`
 --
 ALTER TABLE `jobs`
-  MODIFY `job_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `job_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- 使用表AUTO_INCREMENT `password_resets`
 --
 ALTER TABLE `password_resets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- 使用表AUTO_INCREMENT `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- 使用表AUTO_INCREMENT `user_culture_results`
 --
 ALTER TABLE `user_culture_results`
-  MODIFY `result_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `result_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- 使用表AUTO_INCREMENT `user_profiles`
 --
 ALTER TABLE `user_profiles`
-  MODIFY `profile_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `profile_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- 限制导出的表

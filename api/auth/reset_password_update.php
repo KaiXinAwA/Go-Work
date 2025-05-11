@@ -70,7 +70,17 @@ if ($user) {
             
             // Send email with the new password if update was successful
             if ($updated) {
-                sendResetPasswordEmail($email, $token, $newPassword);
+                $emailSent = sendResetPasswordEmail($email, $token, $newPassword);
+                
+                // Log issues with email sending but don't expose to user
+                if (!$emailSent) {
+                    error_log("Failed to send password reset email to: $email");
+                    
+                    // For development - show temporary password in the error log
+                    if (error_reporting() > 0) {
+                        error_log("DEV MODE - Temporary password for $email: $newPassword");
+                    }
+                }
             }
         } catch (Exception $e) {
             error_log("Error updating password: " . $e->getMessage());

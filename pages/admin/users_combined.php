@@ -32,10 +32,16 @@ $types = '';
 $params = [];
 $whereAdded = true; // We already added WHERE clause
 
-if ($userType > 0 && in_array($userType, $validUserTypes)) {
-    $sql .= " AND user_type = ?";
-    $types .= 'i';
-    $params[] = $userType;
+// Apply user type filter if specified (this works across tabs)
+if ($userType > 0) {
+    // If user switched tabs but kept a filter from another tab, reset to 0 (show all)
+    if (!in_array($userType, $validUserTypes)) {
+        $userType = 0;
+    } else {
+        $sql .= " AND user_type = ?";
+        $types .= 'i';
+        $params[] = $userType;
+    }
 }
 
 if (!empty($searchTerm)) {
@@ -123,12 +129,13 @@ require_once '../../includes/header.php';
                                     <?php endif; ?>
                                 </select>
                             </div>
-                            <div class="col-md-6 mb-3 mb-md-0">
+                            <div class="col-md-4 mb-3 mb-md-0">
                                 <label for="search" class="form-label">Search</label>
                                 <input type="text" class="form-control" id="search" name="search" placeholder="Search by username or email" value="<?php echo htmlspecialchars($searchTerm); ?>">
                             </div>
-                            <div class="col-md-2 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary w-100">Filter</button>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary me-2">Filter</button>
+                                <a href="<?php echo SITE_URL; ?>/pages/admin/users_combined.php?tab=<?php echo $activeTab; ?>" class="btn btn-secondary">Clear Filters</a>
                             </div>
                         </div>
                     </form>
@@ -197,11 +204,8 @@ require_once '../../includes/header.php';
                                                         <i class="fas fa-eye"></i>
                                                     </a>
                                                     <?php 
-                                                    // For staff members, prevent self-deletion
-                                                    $showDelete = true;
-                                                    if ($activeTab == 'staff' && $user['user_id'] == $_SESSION['user_id']) {
-                                                        $showDelete = false;
-                                                    }
+                                                    // Only prevent self-deletion for admin users
+                                                    $showDelete = ($user['user_id'] != $_SESSION['user_id'] || $user['user_type'] != USER_TYPE_ADMIN);
                                                     
                                                     if ($showDelete):
                                                     ?>
@@ -232,13 +236,7 @@ require_once '../../includes/header.php';
                                                             </div>
                                                             <div class="modal-footer">
                                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                                <a href="<?php echo SITE_URL; ?>/api/admin/delete_user.php?id=<?php echo $user['user_id']; ?>&redirect=users_combined.php?tab=<?php echo $activeTab; ?>" class="btn btn-danger">
-                                                                    <?php if ($activeTab == 'staff'): ?>
-                                                                        Delete Staff Member
-                                                                    <?php else: ?>
-                                                                        Delete User
-                                                                    <?php endif; ?>
-                                                                </a>
+                                                                <a href="<?php echo SITE_URL; ?>/api/admin/delete_user.php?id=<?php echo $user['user_id']; ?>&redirect=users_combined.php&tab=<?php echo $activeTab; ?>" class="btn btn-danger">Delete User</a>
                                                             </div>
                                                         </div>
                                                     </div>

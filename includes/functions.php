@@ -204,6 +204,7 @@ function sendResetPasswordEmail($email, $token, $newPassword) {
     
     // If Resend API key is not defined or empty, log the email instead of sending
     if (!defined('RESEND_API_KEY') || empty(RESEND_API_KEY)) {
+        error_log("RESEND_API_KEY is missing or empty - Email delivery will not work");
         error_log("Email would be sent to: $email");
         error_log("Subject: $subject");
         error_log("Message: " . substr($plainTextContent, 0, 100) . "...");
@@ -213,7 +214,12 @@ function sendResetPasswordEmail($email, $token, $newPassword) {
             error_log("Note: No user account found with email: $email");
         }
         
-        return true; // Return true so the flow continues
+        // In development environment, output to error log the password for testing
+        if (error_reporting() > 0) {
+            error_log("DEV MODE - New password for $email: $newPassword");
+        }
+        
+        return false; // Return false since email wasn't actually sent
     }
     
     // Use Resend API to send the email
@@ -256,6 +262,15 @@ function sendResetPasswordEmail($email, $token, $newPassword) {
     if ($httpCode != 200 || $error) {
         error_log("Failed to send email via Resend API. HTTP Code: $httpCode, Error: $error");
         error_log("Response: $response");
+        
+        // Log more debugging information
+        if ($httpCode == 401 || $httpCode == 403) {
+            error_log("API authentication failed. Check your Resend API key.");
+        } else if ($httpCode == 400) {
+            error_log("Invalid request. Check from/to email addresses and content.");
+            error_log("Request data: " . json_encode($data));
+        }
+        
         return false;
     }
     

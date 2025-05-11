@@ -6,6 +6,11 @@ require_once '../includes/functions.php';
 // Note: We're allowing logged-in users to access this page
 // This is to support the "Forgot Password" links in account settings pages
 
+// Set redirect URL to account settings page if user is logged in
+if (isLoggedIn() && empty($_GET['redirect_url'])) {
+    $_GET['redirect_url'] = SITE_URL . '/pages/account_settings.php';
+}
+
 // Get email from URL parameter if available
 $prefillEmail = '';
 if (isset($_GET['email']) && !empty($_GET['email'])) {

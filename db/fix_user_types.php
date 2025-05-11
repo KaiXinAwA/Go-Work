@@ -123,5 +123,5 @@ try {
     echo "<p class='error'>Error: " . $e->getMessage() . "</p>";
 }
 
-echo "<p><a href='../index.php'>Return to Homepage</a> | <a href='../pages/admin/users.php'>Go to Manage Users</a></p>";
+echo "<p><a href='../index.php'>Return to Homepage</a> | <a href='../pages/admin/users_combined.php'>Go to Manage Users</a></p>";
 echo "</body></html>"; 

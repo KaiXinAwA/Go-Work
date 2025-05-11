@@ -49,9 +49,6 @@ require_once '../../includes/header.php';
                         <i class="fas fa-users fa-2x"></i>
                     </div>
                 </div>
-                <div class="card-footer bg-transparent border-0">
-                    <a href="<?php echo SITE_URL; ?>/pages/admin/users.php?type=<?php echo USER_TYPE_JOBSEEKER; ?>" class="text-white">View all job seekers <i class="fas fa-arrow-right ms-1"></i></a>
-                </div>
             </div>
         </div>
         
@@ -65,9 +62,6 @@ require_once '../../includes/header.php';
                         </div>
                         <i class="fas fa-building fa-2x"></i>
                     </div>
-                </div>
-                <div class="card-footer bg-transparent border-0">
-                    <a href="<?php echo SITE_URL; ?>/pages/admin/companies.php" class="text-white">View all companies <i class="fas fa-arrow-right ms-1"></i></a>
                 </div>
             </div>
         </div>
@@ -83,9 +77,6 @@ require_once '../../includes/header.php';
                         <i class="fas fa-briefcase fa-2x"></i>
                     </div>
                 </div>
-                <div class="card-footer bg-transparent border-0">
-                    <a href="<?php echo SITE_URL; ?>/pages/jobs.php" class="text-white">View all jobs <i class="fas fa-arrow-right ms-1"></i></a>
-                </div>
             </div>
         </div>
         
@@ -99,9 +90,6 @@ require_once '../../includes/header.php';
                         </div>
                         <i class="fas fa-file-alt fa-2x"></i>
                     </div>
-                </div>
-                <div class="card-footer bg-transparent border-0">
-                    <a href="#" class="text-white">View details <i class="fas fa-arrow-right ms-1"></i></a>
                 </div>
             </div>
         </div>

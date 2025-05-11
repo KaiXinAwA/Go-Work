@@ -1,54 +1,61 @@
 # GoWork - Job Finding Website
 
-A web-based job finding platform built with HTML, CSS, and JavaScript, using PHP for server-side functionality and MySQL for database storage.
+A comprehensive job finding platform built with HTML, CSS, JavaScript, PHP, and MySQL.
 
 ## Overview
 
-GoWork is a comprehensive job finding platform that connects job seekers with employers. It provides a streamlined interface for users to browse and apply for jobs, and for employers to post job openings and manage applicants.
+GoWork is a full-featured job finding platform that connects job seekers with employers. The platform streamlines the job application process while providing robust management tools for employers, staff, and administrators.
 
-## Features
+## Completed Features
 
 ### For Job Seekers
-- **Account Management**: Register, login, and manage your profile
-- **Resume Upload**: Upload your resume (PDF format)
-- **Job Search**: Browse and search for jobs by keywords and location
-- **Application Tracking**: Track the status of your job applications
-- **One-Click Apply**: Easily apply to jobs with a single click
+- **User Account Management**: Register, login, update profile, and reset password
+- **Resume Management**: Upload and manage resumes in PDF format
+- **Advanced Job Search**: Filter jobs by keywords, location, job type, and salary
+- **Application Tracking**: Monitor application status (pending, viewed, shortlisted, rejected)
+- **Cultural Fit Quiz**: Take a quiz to find companies matching your work style
+- **One-Click Apply**: Apply to jobs with a single click
 
 ### For Employers
-- **Company Profile**: Create and manage your company profile
-- **License Submission**: Submit your company license for verification
-- **Job Posting**: Create and manage job listings
-- **Applicant Management**: Review applicants and manage their statuses
+- **Company Profile**: Create and customize your company profile
+- **License Verification**: Submit company license for official verification
+- **Job Management**: Post, edit, and manage job listings
+- **Applicant Review**: Review applicants and update their application status
+- **Company Culture**: Define your company culture to attract suitable candidates
 
-### For GoWork Company Workers
-- **License Verification**: Review and approve company licenses
+### For GoWork Staff
+- **License Review**: Approve or reject company license submissions
+- **Company Management**: Monitor company profiles and activities
 
-### For Admins
-- **User Management**: Manage all users on the platform
-- **Content Oversight**: Monitor and manage content across the site
+### For Administrators
+- **User Management**: Manage all users including regular users and staff
+- **Content Oversight**: Monitor and manage content across the platform
+- **Platform Statistics**: View key metrics about platform usage
 
 ## Technical Implementation
 
-- **Front-end**: HTML, CSS, JavaScript, Bootstrap 5
-- **Back-end**: PHP
+- **Frontend**: HTML5, CSS3, JavaScript, Bootstrap 5, Font Awesome icons
+- **Backend**: PHP 8.2
 - **Database**: MySQL via XAMPP
-- **Email Functionality**: Resend API
+- **Email System**: Resend API for password resets and notifications
+- **Security**: Password hashing, input sanitization, CSRF protection
+- **Responsive Design**: Mobile-friendly interface
 
 ## Installation & Setup
 
 1. **Prerequisites**:
-   - XAMPP installed on your system (Apache, MySQL, PHP)
+   - XAMPP (Apache, MySQL, PHP)
    - Web browser
+   - Resend API account for email functionality
 
 2. **Setup Instructions**:
-   - Clone or download this repository to your XAMPP's htdocs folder
+   - Clone this repository to your XAMPP's htdocs folder
    - Start Apache and MySQL services in XAMPP
-   - Create a new database named `gowork_db` in phpMyAdmin
+   - Create a database named `gowork_db` in phpMyAdmin
    - Import the database schema from `/db/gowork_db.sql`
    - Configure database connection in `/includes/config.php`
-   - Configure Resend API key in `/includes/config.php` for email functionality
-   - Access the website at `http://localhost/GoWork`
+   - Configure your Resend API key in `/includes/config.php`
+   - Access the website at `http://localhost`
 
 3. **Default Admin Account**:
    - Email: bcs24090019@student.uts.edu.my
@@ -56,44 +63,42 @@ GoWork is a comprehensive job finding platform that connects job seekers with em
 
 ## Directory Structure
 
-- `/assets`: CSS, JavaScript, Images, and Fonts
-- `/uploads`: User-uploaded files (resumes, licenses, profile pictures)
-- `/includes`: PHP utility files and templates
-- `/api`: Backend endpoints for AJAX requests
-- `/pages`: Main website pages
-- `/db`: Database schema
+- `/api`: Backend endpoints for data processing
+- `/assets`: CSS, JavaScript, images, and fonts
+- `/db`: Database schema and setup scripts
+- `/includes`: PHP utility files, templates, and configuration
+- `/pages`: Main website pages organized by user type
+- `/uploads`: User-uploaded files (organized in subdirectories)
 
-## Usage Flow
+## Usage Guide
 
-1. **For Job Seekers**:
-   - Register an account as a job seeker
-   - Complete your profile and upload your resume
-   - Search for jobs and apply with one click
-   - Track your application statuses
+### For Job Seekers
+1. Register/login with your account
+2. Complete your profile and upload your resume
+3. Take the cultural fit quiz to find matching companies
+4. Search for jobs using filters
+5. Apply to positions and track your applications
 
-2. **For Employers**:
-   - Register an account as an employer
-   - Submit your company license for approval
-   - Once approved, post job listings
-   - Review and manage applications
+### For Employers
+1. Register/login with your company account
+2. Submit your company license for verification
+3. Complete your company profile and culture information
+4. Post job listings with detailed descriptions
+5. Review and manage applications
 
-3. **For GoWork Company Workers**:
-   - Login with your credentials
-   - Review company license submissions
-   - Approve or reject licenses
+### For Admin/Staff
+1. Login with your credentials
+2. Review company licenses and user accounts
+3. Manage platform content and user issues
 
-## License Approval Process
+## Future Development Roadmap
 
-1. Employer submits company license (PDF)
-2. GoWork company worker reviews the license
-3. License is either approved or rejected
-4. If approved, employer can start posting jobs
-5. If rejected, employer needs to submit a new license
+- **Messaging System**: Direct communication between employers and candidates
+- **Advanced Analytics**: Detailed insights for employers and job seekers
+- **Mobile Application**: Native mobile apps for iOS and Android
+- **Premium Features**: Subscription-based advanced features
+- **Integration with Job Boards**: Import/export job listings from other platforms
 
-## Notes for Future Development
+---
 
-- Implement advanced search filters
-- Add a messaging system between employers and applicants
-- Implement job recommendations based on user profiles
-- Add analytics dashboard for employers
-- Implement email notifications for application updates
+*This project was developed as a school assignment and demonstrates skills in web development, database management, and application security.*

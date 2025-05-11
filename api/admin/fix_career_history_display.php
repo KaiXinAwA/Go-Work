@@ -13,7 +13,7 @@ $userId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if ($userId <= 0) {
     $_SESSION['error'] = 'Invalid user ID';
-    redirectTo(SITE_URL . '/pages/admin/users.php');
+    redirectTo(SITE_URL . '/pages/admin/users_combined.php');
     exit;
 }
 
@@ -21,7 +21,7 @@ if ($userId <= 0) {
 $user = fetchRow("SELECT * FROM users WHERE user_id = ?", 'i', [$userId]);
 if (!$user) {
     $_SESSION['error'] = 'User not found';
-    redirectTo(SITE_URL . '/pages/admin/users.php');
+    redirectTo(SITE_URL . '/pages/admin/users_combined.php');
     exit;
 }
 

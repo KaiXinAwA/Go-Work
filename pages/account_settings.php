@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
     else {
         $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
         $query = "UPDATE users SET password = ? WHERE user_id = ?";
-        $result = execute($query, 'si', [$hashedPassword, $user['user_id']]);
+        $result = executeQuery($query, 'si', [$hashedPassword, $user['user_id']]);
         
         if ($result) {
             $_SESSION['success'] = 'Password updated successfully';
@@ -161,4 +161,4 @@ require_once '../includes/header.php';
 }
 </style>
 
-<?php require_once '../includes/footer.php'; ?> 
+<?php require_once '../includes/footer.php'; ?>

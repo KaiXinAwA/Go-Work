@@ -91,7 +91,7 @@ $customCSS = '<style>
     
     /* Active filters styling */
     .active-search-filters {
-        background-color: #f8f9fa;
+        background-color:rgb(220, 237, 255);
         border-radius: 8px;
         border-left: 4px solid #0d6efd;
     }
@@ -777,7 +777,7 @@ require_once '../includes/header.php';
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <h6 class="mb-2">Active Filters:</h6>
-                            <span class="badge bg-primary me-2 keyword-filter" style="<?php echo !empty($keywords) ? 'display:inline-block;' : 'display:none;'; ?>">Keywords: <?php echo htmlspecialchars($keywords); ?></span>
+                            <span class="badge bg-info me-2 keyword-filter" style="<?php echo !empty($keywords) ? 'display:inline-block;' : 'display:none;'; ?>">Keywords: <?php echo htmlspecialchars($keywords); ?></span>
                             <span class="badge bg-primary me-2 location-filter" style="<?php echo !empty($location) ? 'display:inline-block;' : 'display:none;'; ?>">Location: <?php echo htmlspecialchars($location); ?></span>
                             
                             <?php if (!empty($jobTypes)): ?>

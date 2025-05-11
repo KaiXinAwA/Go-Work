@@ -30,8 +30,14 @@ $profile = fetchRow("SELECT * FROM user_profiles WHERE user_id = ?", 'i', [$user
 // Check if user is a jobseeker to determine if we should show additional sections
 $isJobSeeker = (int)$user['user_type'] === USER_TYPE_JOBSEEKER;
 
+// Check if user is a company to determine if we should show company sections
+$isCompany = (int)$user['user_type'] === USER_TYPE_COMPANY;
+
 // Get career history if user is a jobseeker
 $careerHistory = $isJobSeeker ? getEnhancedUserCareerHistory($userId) : [];
+
+// Get company details if user is a company
+$companyDetails = $isCompany ? getCompanyProfile($userId) : null;
 
 // Set up form data
 $formData = [
@@ -50,6 +56,30 @@ $formData = [
     'completion_status' => $profile['completion_status'] ?? '',
     'education_highlights' => $profile['education_highlights'] ?? ''
 ];
+
+// Add company-specific data if user is a company
+if ($isCompany) {
+    // Initialize company fields with empty values
+    $formData['company_name'] = '';
+    $formData['company_description'] = '';
+    $formData['contact_number'] = '';
+    $formData['company_address'] = '';
+    $formData['company_city'] = '';
+    $formData['company_state'] = '';
+    $formData['company_country'] = '';
+    
+    // If company details exist, populate the fields
+    if ($companyDetails) {
+        $formData['company_name'] = $companyDetails['company_name'] ?? '';
+        $formData['company_description'] = $companyDetails['description'] ?? '';
+        $formData['contact_number'] = $companyDetails['contact_number'] ?? '';
+        $formData['company_address'] = $companyDetails['address'] ?? '';
+        $formData['company_city'] = $companyDetails['city'] ?? '';
+        $formData['company_state'] = $companyDetails['state'] ?? '';
+        $formData['company_country'] = $companyDetails['country'] ?? '';
+    }
+    // License data has been removed
+}
 
 // Include header
 require_once '../../includes/header.php';
@@ -112,6 +142,7 @@ require_once '../../includes/header.php';
                             </div>
                         </div>
                         
+                        <?php if (!$isCompany): ?>
                         <h5 class="mt-4">Profile Information</h5>
                         
                         <div class="row">
@@ -146,6 +177,7 @@ require_once '../../includes/header.php';
                                 <input type="text" class="form-control" id="country" name="country" value="<?php echo htmlspecialchars($formData['country']); ?>">
                             </div>
                         </div>
+                        <?php endif; ?>
                         
                         <div class="mt-4">
                             <button type="submit" class="btn btn-primary">Update User</button>
@@ -274,8 +306,65 @@ require_once '../../includes/header.php';
                     <?php endif; ?>
                 </div>
             </div>
+            <?php elseif ($isCompany): ?>
+            <!-- Company Information Section - Only for companies -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Company Information</h5>
+                </div>
+                <div class="card-body">
+                    <form action="<?php echo SITE_URL; ?>/api/admin/update_company_info.php" method="POST">
+                        <input type="hidden" name="user_id" value="<?php echo $userId; ?>">
+                        
+                        <div class="mb-3">
+                            <label for="company_name" class="form-label">Company Name</label>
+                            <input type="text" class="form-control" id="company_name" name="company_name" value="<?php echo htmlspecialchars($formData['company_name']); ?>" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="company_description" class="form-label">Company Description</label>
+                            <textarea class="form-control" id="company_description" name="description" rows="4" required><?php echo htmlspecialchars($formData['company_description']); ?></textarea>
+                        </div>
+                        
+                        <h5 class="mt-4 mb-3">Contact Information</h5>
+                        
+                        <div class="mb-3">
+                            <label for="contact_number" class="form-label">Contact Number</label>
+                            <input type="tel" class="form-control" id="contact_number" name="contact_number" value="<?php echo htmlspecialchars($formData['contact_number']); ?>">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="company_address" class="form-label">Address</label>
+                            <input type="text" class="form-control" id="company_address" name="address" value="<?php echo htmlspecialchars($formData['company_address']); ?>">
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="company_city" class="form-label">City</label>
+                                <input type="text" class="form-control" id="company_city" name="city" value="<?php echo htmlspecialchars($formData['company_city']); ?>">
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label for="company_state" class="form-label">State/Province</label>
+                                <input type="text" class="form-control" id="company_state" name="state" value="<?php echo htmlspecialchars($formData['company_state']); ?>">
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label for="company_country" class="form-label">Country</label>
+                                <input type="text" class="form-control" id="company_country" name="country" value="<?php echo htmlspecialchars($formData['company_country']); ?>">
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Update Company Information</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- License section has been removed -->
             <?php else: ?>
-            <!-- For non-jobseeker users, simply don't display the sections -->
+            <!-- For other user types, simply don't display the sections -->
             <?php endif; ?>
             
         </div>
@@ -394,4 +483,4 @@ document.addEventListener('DOMContentLoaded', function() {
 <?php
 // Include footer
 require_once '../../includes/footer.php';
-?> 
+?>

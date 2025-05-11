@@ -373,6 +373,67 @@ require_once '../../includes/header.php';
                         <p><?php echo nl2br(htmlspecialchars($companyDetails['description'])); ?></p>
                     </div>
                     <?php endif; ?>
+                    
+                    <!-- Contact Information -->
+                    <div class="row mt-3">
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted">Email</h6>
+                            <p><?php echo htmlspecialchars($viewedUser['email']); ?></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Company Culture (for Companies) -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Company Culture</h5>
+                </div>
+                <div class="card-body">
+                    <?php 
+                    // Get company culture information
+                    $companyCulture = getCompanyCulture($companyDetails['company_id']);
+                    
+                    // Define attribute display names for better readability
+                    $attributeNames = [
+                        'work_environment' => 'Work Environment',
+                        'overtime' => 'Overtime Expectations',
+                        'management' => 'Management Style',
+                        'work_life_balance' => 'Work-Life Balance',
+                        'dress_code' => 'Dress Code',
+                        'communication' => 'Communication Style',
+                        'decision_making' => 'Decision Making',
+                        'innovation' => 'Innovation',
+                        'social_events' => 'Social Events',
+                        'feedback' => 'Feedback Style'
+                    ];
+                    
+                    if ($companyCulture && !empty($companyCulture['values'])):
+                    ?>
+                        <div class="mb-4">
+                            <?php if (!empty($companyCulture['description'])): ?>
+                                <h6>About Their Culture</h6>
+                                <p><?php echo nl2br(htmlspecialchars($companyCulture['description'])); ?></p>
+                                <hr>
+                            <?php endif; ?>
+                            
+                            <h6>Culture Values</h6>
+                            <div class="row">
+                                <?php foreach ($companyCulture['values'] as $attribute => $value): ?>
+                                    <div class="col-md-6 mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-dark me-2"><?php echo isset($attributeNames[$attribute]) ? htmlspecialchars($attributeNames[$attribute]) : htmlspecialchars(ucfirst($attribute)); ?></span>
+                                            <span><?php echo htmlspecialchars(ucfirst($value)); ?></span>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <div class="alert alert-info">
+                            <p>This company hasn't defined their company culture yet.</p>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
             
@@ -527,14 +588,18 @@ require_once '../../includes/header.php';
             <?php endif; ?>
             
             <?php else: ?>
-            <div class="card mb-4">
-                <div class="card-body">
-                    <div class="alert alert-info mb-0">
-                        <i class="fas fa-info-circle me-2"></i>
-                        This user has not completed their profile yet.
+                <?php if ($viewedUser['user_type'] == USER_TYPE_COMPANY && $companyDetails): ?>
+                    <!-- Company profile exists, don't show incomplete message -->
+                <?php else: ?>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="alert alert-info mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                This user has not completed their profile yet.
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
+                <?php endif; ?>
             <?php endif; ?>
         </div>
     </div>
@@ -563,4 +628,4 @@ require_once '../../includes/header.php';
 <?php
 // Include footer
 require_once '../../includes/footer.php';
-?> 
+?>

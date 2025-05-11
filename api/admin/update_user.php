@@ -15,7 +15,7 @@ if (!isLoggedIn() || !hasUserType(USER_TYPE_ADMIN)) {
 // Check if request method is POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $_SESSION['error'] = 'Invalid request method';
-    redirectTo(SITE_URL . '/pages/admin/users.php');
+    redirectTo(SITE_URL . '/pages/admin/users_combined.php');
 }
 
 // Get user ID
@@ -23,7 +23,7 @@ $userId = isset($_POST['user_id']) ? (int)$_POST['user_id'] : 0;
 
 if ($userId <= 0) {
     $_SESSION['error'] = 'Invalid user ID';
-    redirectTo(SITE_URL . '/pages/admin/users.php');
+    redirectTo(SITE_URL . '/pages/admin/users_combined.php');
 }
 
 // Get user data
@@ -31,7 +31,7 @@ $user = fetchRow("SELECT * FROM users WHERE user_id = ?", 'i', [$userId]);
 
 if (!$user) {
     $_SESSION['error'] = 'User not found';
-    redirectTo(SITE_URL . '/pages/admin/users.php');
+    redirectTo(SITE_URL . '/pages/admin/users_combined.php');
 }
 
 // Get and sanitize input data

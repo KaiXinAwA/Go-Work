@@ -11,7 +11,7 @@ if (!isLoggedIn() || !hasUserType(USER_TYPE_ADMIN)) {
 // Check if request method is POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $_SESSION['error'] = 'Invalid request method';
-    redirectTo(SITE_URL . '/pages/admin/users.php');
+    redirectTo(SITE_URL . '/pages/admin/users_combined.php');
     exit;
 }
 
