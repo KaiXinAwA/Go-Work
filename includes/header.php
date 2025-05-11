@@ -99,7 +99,7 @@ require_once $root_path . 'includes/functions.php';
     
     /* Adjust content container for fixed navbar */
     .content-container {
-        padding-top: 70px;
+        padding-top: 50px;
     }
     
     /* Only add padding when not on homepage */

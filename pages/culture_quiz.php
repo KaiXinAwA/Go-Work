@@ -61,6 +61,8 @@ if ($isLoggedIn) {
 }
 .badge-black {
     background-color: #000 !important;
+    font-size: 1rem !important;
+    padding: 0.5rem 0.7rem !important;
 }
 </style>
 
@@ -102,10 +104,7 @@ if ($isLoggedIn) {
                         <p>Based on your responses, here's your work culture profile:</p>
                         <div class="culture-profile mb-4">
                             <?php foreach ($userCultureResults['culture_profile']['values'] as $attribute => $value): ?>
-                                <div class="culture-attribute mb-2">
-                                    <span class="badge badge-black me-2"><?php echo htmlspecialchars(ucfirst($attribute)); ?></span>
-                                    <span class="fw-bold"><?php echo htmlspecialchars(ucfirst($value)); ?></span>
-                                </div>
+                                <span class="badge bg-dark me-2 mb-2 p-2 d-inline-block" style="font-size: 1rem;"><?php echo htmlspecialchars(ucfirst($attribute)); ?></span>
                             <?php endforeach; ?>
                         </div>
                         <p>Take the quiz again to update your profile or view companies that match your cultural preferences.</p>
@@ -147,7 +146,6 @@ if ($isLoggedIn) {
                             </div>
                             <div class="card-footer bg-white">
                                 <a href="<?php echo SITE_URL; ?>/pages/company_profile.php?id=<?php echo $company['company_id']; ?>" class="btn quiz-btn-outline-black">View Company</a>
-                                <a href="<?php echo SITE_URL; ?>/pages/jobs.php?company=<?php echo $company['company_id']; ?>" class="btn quiz-btn-black float-end">See Jobs</a>
                             </div>
                         </div>
                     </div>
@@ -417,10 +415,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Display each culture value
         for (const [attribute, value] of Object.entries(results.values)) {
             const attributeEl = document.createElement('div');
-            attributeEl.className = 'culture-attribute mb-2';
             attributeEl.innerHTML = `
-                <span class="badge badge-black me-2">${capitalizeFirstLetter(attribute)}</span>
-                <span class="fw-bold">${capitalizeFirstLetter(value)}</span>
+                <span class="badge bg-dark me-2 mb-2 p-2 d-inline-block" style="font-size: 1rem;">${capitalizeFirstLetter(attribute)}</span>
             `;
             cultureResults.appendChild(attributeEl);
         }

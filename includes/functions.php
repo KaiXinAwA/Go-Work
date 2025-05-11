@@ -377,9 +377,9 @@ function formatSalaryRange($min, $max) {
 }
 
 /**
- * Get all job types
+ * Get all available job types from the system
  * 
- * @return array Job types
+ * @return array Array of job types
  */
 function getJobTypes() {
     return [
@@ -654,7 +654,7 @@ function searchJobs($keywords = '', $location = '', $jobTypes = [], $categories 
                     /* Categories match */
                     j.categories LIKE ?
                 )";
-                $types .= 'sssssssssss';
+                $types .= 'ssssssssss';
                 $params = array_merge(
                     $params, 
                     [
@@ -692,7 +692,7 @@ function searchJobs($keywords = '', $location = '', $jobTypes = [], $categories 
                     /* Categories match */
                     j.categories LIKE ?
                 )";
-                $types .= 'sssssssssss';
+                $types .= 'ssssssssss';
                 $params = array_merge(
                     $params, 
                     [

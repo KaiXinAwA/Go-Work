@@ -80,34 +80,17 @@ require_once '../includes/header.php';
 }
 </style>
 
-<section class="culture-match-header">
+<section class="container-fluid culture-match-header">
     <div class="container">
         <h1>Companies Culture Match</h1>
         <p class="lead">Showing companies based on your cultural preferences</p>
+        <a href="<?php echo SITE_URL; ?>/pages/culture_quiz.php" class="btn btn-light mt-2">
+            <i class="fas fa-arrow-left"></i> Back to Culture Quiz
+        </a>
     </div>
 </section>
 
 <section class="container my-5">
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header bg-dark text-white">
-                    Your Cultural Profile
-                </div>
-                <div class="card-body">
-                    <div>
-                        <?php foreach ($userCultureResults['culture_profile']['values'] as $attribute => $value): ?>
-                            <span class="badge bg-dark me-2 mb-2 p-2 d-inline-block"><?php echo htmlspecialchars(ucfirst($attribute)); ?></span>
-                        <?php endforeach; ?>
-                    </div>
-                    <div class="mt-3">
-                        <a href="<?php echo SITE_URL; ?>/pages/culture_quiz.php" class="btn btn-dark">Retake Quiz</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="row mb-3">
         <div class="col-12">
             <h2>Companies with Culture Data (<?php echo count($filteredCompanies); ?>)</h2>
@@ -174,7 +157,6 @@ require_once '../includes/header.php';
                         <div class="card-footer bg-white">
                             <div class="d-flex justify-content-between">
                                 <a href="<?php echo SITE_URL; ?>/pages/view_company_profile.php?id=<?php echo $company['company_id']; ?>" class="btn btn-outline-dark">View Profile</a>
-                                <a href="<?php echo SITE_URL; ?>/pages/jobs.php?company=<?php echo $company['company_id']; ?>" class="btn btn-dark">See Jobs</a>
                             </div>
                         </div>
                     </div>
