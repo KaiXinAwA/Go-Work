@@ -103,3 +103,4 @@ GoWork is a full-featured job finding platform that connects job seekers with em
 
 *This project was developed as a school assignment and demonstrates skills in web development, database management, and application security.*
 # Redeploy
+# Redeploy
