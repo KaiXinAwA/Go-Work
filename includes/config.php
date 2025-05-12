@@ -9,10 +9,11 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Database configuration
-define('DB_HOST', 'gowork.mysql.database.azure.com');      // Database host
-define('DB_USER', 'jiaying');           // Database username
-define('DB_PASS', getenv('DB_PASS') ?: 'Mickey1928@');               // Database password (empty by default for XAMPP)
-define('DB_NAME', 'gowork_db');      // Database name
+define('DB_HOST', getenv('DB_HOST'));
+define('DB_NAME', getenv('DB_NAME'));
+define('DB_USER', getenv('DB_USER'));
+define('DB_PASS', getenv('DB_PASS'));
+define('RESEND_API_KEY', getenv('RESEND_API_KEY'));
 
 // SSL for database connection
 $mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, 3306);
@@ -39,7 +40,6 @@ define('MAX_PROFILE_PIC_SIZE', 2 * 1024 * 1024); // 2MB
 
 // Email configuration for Resend
 // Update with your actual API key from https://resend.com/api-keys
-define('RESEND_API_KEY', 're_669yudYo_7WWDo9JFNMG3nPbwa5ykwBY6'); // Replace with your actual API key
 define('EMAIL_FROM', 'onboarding@resend.dev');  // Use Resend's verified domain or your own verified domain
 define('EMAIL_FROM_NAME', 'GoWork');
 
