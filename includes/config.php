@@ -9,14 +9,22 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Database configuration
-define('DB_HOST', 'localhost');      // Database host
-define('DB_USER', 'root');           // Database username
-define('DB_PASS', '');               // Database password (empty by default for XAMPP)
+define('DB_HOST', 'gowork.mysql.database.azure.com');      // Database host
+define('DB_USER', 'jiaying');           // Database username
+define('DB_PASS', getenv('DB_PASS') ?: 'Mickey1928@');               // Database password (empty by default for XAMPP)
 define('DB_NAME', 'gowork_db');      // Database name
+
+// SSL for database connection
+$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, 3306);
+$mysqli->ssl_set(NULL, NULL, '/Users/jiayingsong/Documents/GitHub/GoWork/includes/DigiCertGlobalRootCA.crt.pem', NULL, NULL);
+$mysqli->real_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, 3306, NULL, MYSQLI_CLIENT_SSL);
+if ($mysqli->connect_error) {
+    die('Connection failed: ' . $mysqli->connect_error);
+}
 
 // Site configuration
 define('SITE_NAME', 'GoWork');
-define('SITE_URL', 'http://localhost'); // Adjust if needed
+define('SITE_URL', (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST']);
 
 // File upload paths
 define('UPLOAD_DIR', $_SERVER['DOCUMENT_ROOT'] . '/uploads/');

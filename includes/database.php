@@ -2,7 +2,7 @@
 /**
  * Database connection handler
  */
-require_once 'config.php';
+require_once __DIR__ . '/config.php';
 
 /**
  * Get database connection
@@ -18,7 +18,15 @@ function getDbConnection() {
     }
     
     // Create new connection
-    $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+    $conn = new mysqli(
+        'gowork.mysql.database.azure.com', // Azure database host
+        'jiaying',                 // Azure database username
+        getenv('DB_PASS') ?: 'Mickey1928@', // Password from environment variable or fallback
+        'gowork_db',                     // Database name
+        3306                             // Port
+    );
+    
+    $conn->ssl_set(NULL, NULL, __DIR__ . '/Users/jiayingsong/Documents/GitHub/GoWork/includes/DigiCertGlobalRootCA.crt.pem', NULL, NULL);
     
     // Check connection
     if ($conn->connect_error) {
