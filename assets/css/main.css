@@ -1,0 +1,961 @@
+/* 
+ * GoWork Main CSS
+ */
+
+/* Roboto Condensed Variable Font */
+.roboto-condensed-regular {
+  font-family: "Roboto Condensed", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.roboto-condensed-light {
+  font-family: "Roboto Condensed", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.roboto-condensed-bold {
+  font-family: "Roboto Condensed", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.roboto-condensed-black {
+  font-family: "Roboto Condensed", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 900;
+  font-style: normal;
+}
+
+.roboto-condensed-italic {
+  font-family: "Roboto Condensed", sans-serif;
+  font-optical-sizing: auto;
+  font-style: italic;
+}
+
+/* General Styles */
+body {
+    font-family: "Roboto Condensed", sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    max-width: 1200px;
+}
+
+footer {
+    margin-top: auto;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+/* Cards */
+.card {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    font-weight: 600;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 4px;
+    padding: 0.5rem 1.5rem;
+    transition: all 0.3s ease;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.btn-primary {
+    background-color: #000000;
+    border-color: #000000;
+    color: rgb(255, 255, 255);
+}
+
+.btn-primary:hover {
+    background-color: white !important;
+    border-color: #000000;
+    color: black;
+}
+
+.btn-outline-primary {
+    color: #000000;
+    border-color: #000000;
+}
+
+.btn-outline-primary:hover {
+    background-color: #000000;
+    color: white;
+}
+
+/* Add btn-outline-secondary styles after btn-outline-primary */
+.btn-outline-primary:hover {
+    background-color: #000000;
+    color: white;
+}
+
+.btn-outline-secondary {
+    color: #000000;
+    border-color: #000000;
+    background-color: transparent;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #000000;
+    border-color: #000000;
+    color: white;
+}
+
+/* Forms */
+.form-control {
+    border-radius: 4px;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ced4da;
+}
+
+.form-control:focus {
+    border-color: #666666;
+    box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.25);
+}
+
+/* Alerts */
+.alert {
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* Job Listings */
+.job-card {
+    transition: transform 0.3s ease;
+}
+
+.job-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.job-title {
+    color: #000000;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.company-name {
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.job-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.job-detail {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+/* User Profile */
+.profile-header {
+    background-color: #f8f9fa;
+    padding: 2rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Dashboard Stats */
+.stat-card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #000000;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #212529;
+}
+
+.stat-title {
+    font-size: 1rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+}
+
+/* File Upload */
+.custom-file-upload {
+    border: 1px dashed #ced4da;
+    border-radius: 4px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.custom-file-upload:hover {
+    border-color: #000000;
+    background-color: #f1f1f1;
+}
+
+.custom-file-upload i {
+    font-size: 2rem;
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+/* Badge Styles */
+.badge {
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+    font-weight: 500;
+    border-radius: 4px;
+}
+
+.badge-pending {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.badge-approved {
+    background-color: #198754;
+    color: white;
+}
+
+.badge-rejected {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Hero Section */
+.hero-section {
+    background-color: #000000;
+    color: white;
+    margin-bottom: 3rem;
+    overflow: hidden;
+    width: 100%;
+}
+
+.hero-section .container-fluid {
+    width: 100%;
+}
+
+.hero-section .row {
+    align-items: stretch;
+}
+
+.hero-content {
+    padding: 3rem 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 100%;
+}
+
+.hero-image-container {
+    padding: 0 !important;
+    height: auto;
+}
+
+.hero-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+.hero-title {
+    font-family: "Roboto Condensed", sans-serif;
+    font-size: 2.2rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.hero-subtitle {
+    font-family: "Roboto Condensed", sans-serif;
+    font-size: 1rem;
+    font-weight: 300;
+    margin-bottom: 1.5rem;
+    opacity: 0.9;
+    letter-spacing: 0.5px;
+    max-width: 500px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.hero-buttons .btn {
+    padding: 0.5rem 1.2rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Search Box */
+.search-box {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+/* Application Status */
+.application-status {
+    font-weight: 600;
+}
+
+.status-pending {
+    color: #ffc107;
+}
+
+.status-viewed {
+    color: #0d6efd;
+}
+
+.status-shortlisted {
+    color: #198754;
+}
+
+.status-rejected {
+    color: #dc3545;
+}
+
+/* Help Centre */
+.help-centre-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 50px;
+    padding: 12px 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.help-centre-btn:hover {
+    background-color: #0056b3;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+}
+
+.help-centre-btn i {
+    font-size: 1.2rem;
+    margin-right: 8px;
+}
+
+.help-btn-img {
+    width: auto;
+    height: 24px;
+    border-radius: 4px;
+    object-fit: contain;
+    background-color: white;
+    padding: 2px;
+    margin-right: 8px;
+}
+
+/* Navigation */
+.navbar {
+    background-color: transparent !important;
+    box-shadow: none;
+    transition: all 0.3s ease;
+}
+
+.navbar-brand {
+    font-weight: 900;
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+    color: #fff !important;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-logo {
+    width: auto;
+    height: 45px;
+    background-color: white;
+    border-radius: 4px;
+    padding: 2px;
+}
+
+.navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* Navbar hover effect */
+.navbar-nav .nav-item .nav-link {
+    position: relative;
+    padding: 8px 15px;
+    color: #fff !important;
+}
+
+.navbar-nav .nav-item .nav-link::after {
+    content: '';
+    width: 0;
+    height: 2px;
+    background-color: #fff;
+    display: block;
+    margin: auto;
+    transition: width 0.5s ease;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    opacity: 0;
+}
+
+.navbar-nav .nav-item:hover .nav-link::after {
+    width: 100%;
+    opacity: 1;
+}
+
+/* Dropdown menu - IMPORTANT overrides */
+.navbar .dropdown-menu,
+.dropdown-menu:not(.filter-dropdown .dropdown-menu) {
+    border-radius: 8px !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2) !important;
+    border: none !important;
+    padding: 0.5rem 0 !important;
+    background-color: #212529 !important;
+    min-width: 220px !important;
+    margin-top: 5px !important;
+    overflow: hidden !important;
+    font-family: "Roboto Condensed", sans-serif !important;
+    animation: fadeDropdown 0.2s ease !important;
+    display: none !important; /* Ensure dropdowns are hidden by default */
+}
+
+/* Create fade-in animation */
+@keyframes fadeDropdown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* Only show dropdown on click with 'show' class */
+.navbar-nav .dropdown-menu.show,
+.dropdown:not(.filter-dropdown) .dropdown-menu.show {
+    display: block !important;
+}
+
+/* Create invisible bridge between menu and toggle to prevent menu from closing */
+.navbar-nav .dropdown::after,
+.dropdown:not(.filter-dropdown)::after {
+    display: none;
+}
+
+/* Add padding to top of dropdown menu to create a larger hit area */
+.navbar-nav .dropdown-menu::before,
+.dropdown-menu:not(.filter-dropdown .dropdown-menu)::before {
+    display: none;
+}
+
+/* Position dropdown menus correctly */
+.navbar-nav .dropdown,
+.dropdown:not(.filter-dropdown) {
+    position: relative !important;
+}
+
+.navbar-nav .dropdown-menu,
+.dropdown-menu:not(.filter-dropdown .dropdown-menu) {
+    position: absolute !important;
+    float: none !important;
+}
+
+/* Keep dropdown-menu-end class working properly */
+.dropdown-menu-end:not(.filter-dropdown .dropdown-menu) {
+    right: 0 !important;
+    left: auto !important;
+}
+
+/* Dropdown item hover effects - IMPORTANT overrides */
+.navbar .dropdown-menu .dropdown-item,
+.dropdown-menu:not(.filter-dropdown .dropdown-menu) .dropdown-item {
+    color: #fff !important;
+    padding: 0.8rem 1.5rem !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    transition: all 0.3s ease !important;
+    font-size: 0.95rem !important;
+    font-weight: 500 !important;
+    border-left: 3px solid transparent !important;
+    position: relative !important;
+    font-family: "Roboto Condensed", sans-serif !important;
+    margin: 0 !important;
+    background-color: transparent !important;
+}
+
+.navbar .dropdown-menu .dropdown-item:before,
+.dropdown-menu:not(.filter-dropdown .dropdown-menu) .dropdown-item:before {
+    content: '' !important;
+    position: absolute !important;
+    left: 0.75rem !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 0 !important;
+    height: 0 !important;
+    border-style: solid !important;
+    border-width: 4px 0 4px 4px !important;
+    border-color: transparent transparent transparent transparent !important;
+    transition: all 0.3s ease !important;
+    opacity: 0 !important;
+}
+
+.navbar .dropdown-menu .dropdown-item:hover:before,
+.navbar .dropdown-menu .dropdown-item:focus:before,
+.dropdown-menu:not(.filter-dropdown .dropdown-menu) .dropdown-item:hover:before,
+.dropdown-menu:not(.filter-dropdown .dropdown-menu) .dropdown-item:focus:before {
+    opacity: 1 !important;
+    border-color: transparent transparent transparent #fff !important;
+}
+
+.navbar .dropdown-menu .dropdown-item:hover,
+.navbar .dropdown-menu .dropdown-item:focus,
+.dropdown-menu:not(.filter-dropdown .dropdown-menu) .dropdown-item:hover,
+.dropdown-menu:not(.filter-dropdown .dropdown-menu) .dropdown-item:focus {
+    background-color: #2c3237 !important;
+    color: #fff !important;
+    border-left: 3px solid #fff !important;
+    padding-left: 1.7rem !important;
+    text-decoration: none !important;
+}
+
+.navbar .dropdown-menu .dropdown-item.active,
+.dropdown-menu:not(.filter-dropdown .dropdown-menu) .dropdown-item.active {
+    background-color: #2c3237 !important;
+    color: #fff !important;
+    border-left: 3px solid #fff !important;
+}
+
+.navbar .dropdown-menu .dropdown-divider,
+.dropdown-menu:not(.filter-dropdown .dropdown-menu) .dropdown-divider {
+    border-top-color: #2c3237 !important;
+    margin: 0.3rem 0 !important;
+    opacity: 0.8 !important;
+}
+
+/* Responsive adjustments for hero */
+@media (max-width: 768px) {
+    .hero-content {
+        padding: 2rem;
+    }
+    
+    .hero-title {
+        font-size: 1.8rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 0.9rem;
+    }
+    
+    .hero-buttons .btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.8rem;
+    }
+    
+    .profile-header {
+        text-align: center;
+    }
+    
+    .profile-avatar {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Section Headings */
+section h2 {
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Review License Button */
+.btn-review-license {
+    color: #000000;
+    border-color: #000000;
+    background-color: transparent;
+    transition: all 0.3s ease;
+}
+
+.btn-review-license:hover {
+    color: #000000;
+    background-color: #ffc107;
+    border-color: #ffc107;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 193, 7, 0.2);
+}
+
+/* Mobile dropdown fixes with strong specificity */
+@media (max-width: 991.98px) {
+    .navbar-nav .dropdown:hover > .dropdown-menu,
+    .dropdown:not(.filter-dropdown):hover > .dropdown-menu {
+        display: none !important;
+    }
+    
+    .navbar-nav .dropdown-menu.show,
+    .dropdown-menu.show:not(.filter-dropdown .dropdown-menu) {
+        display: block !important;
+    }
+
+    .navbar-nav .dropdown-menu,
+    .dropdown:not(.filter-dropdown) .dropdown-menu {
+        position: static !important;
+        float: none !important;
+        width: auto !important;
+        max-width: 100% !important;
+        margin-top: 0 !important;
+        background-color: #212529 !important;
+        border: 0 !important;
+        box-shadow: none !important;
+    }
+    
+    /* Adjust dropdown item padding for mobile */
+    .navbar .dropdown-menu .dropdown-item,
+    .dropdown:not(.filter-dropdown) .dropdown-menu .dropdown-item {
+        padding: 0.6rem 1.2rem !important;
+    }
+    
+    /* Adjust hover styles for better mobile interaction */
+    .navbar .dropdown-menu .dropdown-item:hover,
+    .navbar .dropdown-menu .dropdown-item:focus,
+    .dropdown:not(.filter-dropdown) .dropdown-menu .dropdown-item:hover,
+    .dropdown:not(.filter-dropdown) .dropdown-menu .dropdown-item:focus {
+        padding-left: 1.5rem !important;
+    }
+
+    /* Ensure navbar has solid background when expanded on mobile */
+    .navbar.navbar-expand-lg.navbar-dark {
+        background-color: #000000 !important;
+    }
+    
+    /* Ensure dropdown menus have solid background on mobile */
+    .navbar-collapse {
+        background-color: #000000;
+        padding: 1rem;
+        border-radius: 0 0 8px 8px;
+    }
+    
+    /* Fix dropdown display on mobile */
+    .navbar-nav .dropdown-menu {
+        position: static !important;
+        float: none !important;
+        width: 100% !important;
+        background-color: #212529 !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+    
+    /* Override any hover effect for mobile */
+    .navbar-nav .dropdown:hover > .dropdown-menu {
+        display: none !important;
+    }
+    
+    /* Only show dropdown on click (with 'show' class) */
+    .navbar-nav .dropdown-menu.show {
+        display: block !important;
+    }
+    
+    /* Mobile user action buttons */
+    .navbar-nav .mobile-user-actions {
+        margin-top: 1rem !important;
+        width: 100% !important;
+    }
+    
+    .navbar-nav .mobile-user-actions-container {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+    }
+    
+    /* Style mobile buttons to match regular nav-link */
+    .navbar-nav .mobile-user-actions .nav-link {
+        display: inline-block !important; 
+        color: #fff !important;
+        margin-bottom: 0.5rem !important;
+        padding: 8px 15px !important;
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
+        text-align: center !important;
+        position: relative !important;
+        font-weight: 500 !important;
+        transition: transform 0.3s ease !important;
+    }
+    
+    /* Underline that matches the word length */
+    .navbar-nav .mobile-user-actions .nav-link::after {
+        content: '' !important;
+        width: 0 !important;
+        height: 2px !important;
+        background-color: #fff !important;
+        display: block !important;
+        margin: auto !important;
+        transition: width 0.3s ease !important;
+        position: absolute !important;
+        bottom: 0 !important;
+        left: 0 !important; /* Start from center */
+        opacity: 0 !important;
+    }
+    
+    /* Hover effect - underline expands to word length */
+    .navbar-nav .mobile-user-actions .nav-link:hover {
+        transform: scale(1.07) !important;
+        color: #ffffff !important;
+    }
+    
+    .navbar-nav .mobile-user-actions .nav-link:hover::after {
+        width: 100% !important;
+        opacity: 1 !important;
+    }
+    
+    .navbar-nav .mobile-user-actions .nav-link i {
+        margin-right: 0.5rem !important;
+        width: 20px !important;
+        text-align: center !important;
+    }
+    
+    .navbar-nav .mobile-user-actions .border-top {
+        width: 100% !important;
+        margin-bottom: 1rem !important;
+        opacity: 0.3 !important;
+    }
+}
+
+/* Job Filter Dropdown Styles */
+.jobs-container .filter-dropdown .dropdown-menu {
+    display: none !important;
+    z-index: 1050 !important;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    max-height: 80vh;
+    overflow-y: auto;
+    position: fixed !important;
+    padding: 30px !important;
+    padding-bottom: 10px !important;
+    margin-bottom: 10px !important;
+}
+
+/* Ensure headings are visible in dropdown */
+.filter-dropdown h6 {
+    color: #000000 !important;
+    font-weight: 600 !important;
+    margin-top: 15px !important;
+    margin-bottom: 10px !important;
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+    position: relative !important;
+    z-index: 1 !important;
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+}
+
+/* First heading in dropdown should have no top margin */
+.filter-dropdown h6:first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* Add spacing between sections */
+.filter-dropdown .mb-3 {
+    margin-bottom: 1rem !important;
+}
+
+/* Ensure proper spacing for accordion items */
+.filter-dropdown .accordion-item {
+    margin-bottom: 8px !important;
+}
+
+.filter-dropdown .accordion-button {
+    padding: 12px 15px !important;
+    line-height: 1.4 !important;
+}
+
+/* Sticky footer for filter dropdown */
+.dropdown-sticky-footer {
+    position: sticky !important;
+    bottom: 0 !important;
+    background: white !important;
+    padding: 15px !important;
+    border-top: 1px solid rgba(0,0,0,0.1) !important;
+    margin: 0 !important;
+    display: flex !important;
+    z-index: 10 !important;
+}
+
+/* Remove any extra spacing from the form */
+.filter-dropdown form {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* Ensure the last element in the form doesn't add extra space */
+.filter-dropdown form > *:last-child {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* Reduce spacing for horizontal rules */
+.filter-dropdown hr {
+    margin: 0.75rem 0 !important;
+    opacity: 0.1;
+}
+
+/* Ensure proper spacing for salary range and date posted sections */
+.filter-dropdown .salary-range-section,
+.filter-dropdown .date-posted-section {
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+/* Style filter count badges to ensure visibility */
+.filter-count {
+    background-color: #fff !important;
+    color: #000 !important;
+    font-weight: bold !important;
+    padding: 4px 8px !important;
+    border-radius: 10px !important;
+    display: inline-block !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
+    position: relative !important;
+    z-index: 100 !important;
+    font-size: 0.8rem !important;
+    min-width: 20px !important;
+    text-align: center !important;
+    margin-left: 5px !important;
+    border: 1px solid #000 !important;
+}
+
+/* Force display of filter-count, overriding any other styles */
+#filterDropdown .filter-count {
+    display: inline-block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Hide filter-count only when it should be hidden */
+#filterDropdown .filter-count.hidden,
+#filterDropdown .filter-count[style*="display: none"] {
+    display: none !important;
+}
+
+.job-type-count, .category-count {
+    background-color: #007bff !important;
+    color: #fff !important;
+    font-weight: bold !important;
+    border-radius: 10px !important;
+    padding: 2px 6px !important;
+    margin-left: 5px !important;
+    display: inline-block !important;
+    position: relative !important;
+    z-index: 100 !important;
+    font-size: 0.8rem !important;
+    min-width: 20px !important;
+    text-align: center !important;
+}
+
+/* Ensure dropdown spacer is persistent */
+.dropdown-spacer {
+    width: 100% !important;
+    display: block !important;
+    clear: both !important;
+    min-height: 70px !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+}
+
+/* Make sure job container has minimum height */
+.jobs-container {
+    min-height: 500px !important;
+    position: relative !important;
+}
+
+/* Ensure job results have minimum height */
+.jobs-container .col-md-8 {
+    min-height: 400px !important;
+}
+
+/* Style for no results message to ensure it doesn't collapse
+.no-results-message {
+    min-height: 150px !important;
+    padding: 20px !important;
+    margin-bottom: 150px !important;
+}*/
+.no-results-message {
+    min-height: auto; /* Let content dictate height */
+    padding: 12px 16px; /* Balanced padding */
+    margin-bottom: 30px; /* Reasonable spacing below */
+    max-width: 800px; /* Prevent overly wide box */
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center; /* Center-align text */
+    border-radius: 4px; /* Optional: subtle rounded corners */
+}

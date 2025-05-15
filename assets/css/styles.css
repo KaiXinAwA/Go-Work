@@ -1,0 +1,89 @@
+/* Filter dropdown styles */
+.filter-dropdown .dropdown-menu.show {
+    display: block !important;
+    max-height: 75vh; /* Limit to 75% of viewport height */
+    overflow-y: auto;
+    z-index: 1050 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    margin-bottom: 30px !important; /* Add space between dropdown and footer */
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+    border-radius: 0.5rem;
+}
+
+.filter-dropdown .dropdown-menu {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 0.375rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    background-color: #fff;
+    transform: none !important;
+}
+
+/* Category accordion items - better height control */
+.nested-accordion .accordion-body {
+    max-height: 220px; 
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+/* Mobile-specific adjustments for dropdown */
+@media (max-width: 767px) {
+    .filter-dropdown .dropdown-menu.show {
+        max-height: 65vh; /* More restrictive height on mobile */
+        margin-bottom: 50px !important; /* More space at bottom on mobile */
+    }
+}
+
+/* Force visible when show class is present */
+.show.dropdown-menu {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Make nested accordion elements not break the dropdown */
+.nested-accordion .accordion-item {
+    border: 1px solid rgba(0,0,0,.125);
+    margin-bottom: 0.5rem;
+}
+
+/* Better scrollbar styling for webkit browsers */
+.filter-dropdown .dropdown-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.filter-dropdown .dropdown-menu::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.filter-dropdown .dropdown-menu::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+.filter-dropdown .dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Filter count badge */
+.filter-count {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+/* Responsive dropdown position */
+@media (max-width: 767px) {
+    .filter-dropdown .dropdown-menu {
+        position: fixed !important;
+        top: auto !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        max-height: 65vh;
+        margin-top: 10px !important;
+        z-index: 1050 !important;
+    }
+} 

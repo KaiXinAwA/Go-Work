@@ -1,0 +1,87 @@
+/**
+ * GoWork Dropdown CSS Fixes
+ * Specific targeted fixes for dropdown menus to prevent conflicts between navbar and filter dropdowns
+ */
+
+/* NAVBAR DROPDOWN FIXES - extremely specific selectors */
+/* Force navbar dropdowns to ONLY work with click behavior */
+nav.navbar .dropdown:hover > .dropdown-menu {
+    display: none !important;
+}
+
+/* Only show navbar dropdowns when the show class is present */
+nav.navbar .dropdown > .dropdown-menu {
+    display: none !important;
+}
+
+nav.navbar .dropdown > .dropdown-menu.show {
+    display: block !important;
+    z-index: 1030 !important;
+    position: absolute !important;
+}
+
+/* Mobile fixes for navbar dropdowns */
+@media (max-width: 991.98px) {
+    nav.navbar .dropdown > .dropdown-menu.show {
+        position: static !important;
+        float: none !important;
+        width: 100% !important;
+    }
+}
+
+/* Special handling for the user dropdown in the navbar */
+nav.navbar .dropdown#navbarDropdown > .dropdown-menu.show,
+nav.navbar .dropdown-toggle#navbarDropdown + .dropdown-menu.show {
+    display: block !important;
+    right: 0 !important;
+    left: auto !important;
+}
+
+/* JOB FILTER DROPDOWN FIXES - extremely specific selectors */
+/* Job filter dropdown - never show on hover but allow click */
+.jobs-container .filter-dropdown:hover > .dropdown-menu:not(.show) {
+    display: none !important;
+}
+
+/* Only hide dropdown menus that aren't shown yet */
+.jobs-container .filter-dropdown > .dropdown-menu:not(.show) {
+    display: none !important;
+}
+
+/* When show class is present, ALWAYS display the dropdown */
+.jobs-container .filter-dropdown > .dropdown-menu.show {
+    display: block !important;
+    z-index: 1020 !important;
+    position: absolute !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    transform: none !important;
+}
+
+/* Ensure proper positioning of job filter dropdowns */
+.jobs-container .filter-dropdown {
+    position: relative !important;
+}
+
+/* Special fix for filter dropdown button */
+#filterDropdown {
+    cursor: pointer;
+    position: relative;
+    z-index: 1021;
+}
+
+/* Override any Bootstrap hidden styles for the shown dropdown */
+.dropdown-menu.show[data-filter-dropdown-menu="true"] {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Prevent other selectors from overriding these settings */
+.dropdown[data-filter-dropdown="true"] > .dropdown-menu:not(.show) {
+    display: none !important;
+}
+
+.dropdown[data-filter-dropdown="true"] > .dropdown-menu.show {
+    display: block !important;
+} 
