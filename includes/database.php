@@ -27,6 +27,15 @@ function getDbConnection() {
     );
     
     $conn->ssl_set(NULL, NULL, __DIR__ . '/DigiCertGlobalRootCA.crt.pem', NULL, NULL);
+        'gowork.mysql.database.azure.com', // Azure database host
+        'jiaying',                 // Azure database username
+        getenv('DB_PASS') ?: 'Mickey1928@', // Password from environment variable or fallback
+        'gowork_db',                     // Database name
+        3306                             // Port
+    );
+    
+    $conn->ssl_set(NULL, NULL, __DIR__ . '/Users/jiayingsong/Documents/GitHub/GoWork/includes/DigiCertGlobalRootCA.crt.pem', NULL, NULL);
+>>>>>>> 04b5e14b467cfe46c383f93691120ccdfaeee4db
     
     // Check connection
     if ($conn->connect_error) {

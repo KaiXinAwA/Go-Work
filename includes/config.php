@@ -15,6 +15,7 @@ define('DB_USER', getenv('DB_USER'));
 define('DB_PASS', getenv('DB_PASS'));
 define('RESEND_API_KEY', getenv('RESEND_API_KEY'));
 
+
 // SSL for database connection - 使用 mysqli_init() 初始化连接
 $mysqli = mysqli_init();
 // 设置连接选项，强制使用 SSL
@@ -22,6 +23,9 @@ $mysqli->options(MYSQLI_OPT_SSL_VERIFY_SERVER_CERT, true);
 // 设置 SSL 参数
 $mysqli->ssl_set(NULL, NULL, __DIR__ . '/DigiCertGlobalRootCA.crt.pem', NULL, NULL);
 // 建立实际连接，确保使用 SSL
+// SSL for database connection
+$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, 3306);
+$mysqli->ssl_set(NULL, NULL, 'C:\Users\wongi\Downloads\GoWork-main.zip\GoWork-main\includes\DigiCertGlobalRootCA.crt.pem', NULL, NULL);
 $mysqli->real_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, 3306, NULL, MYSQLI_CLIENT_SSL);
 if ($mysqli->connect_error) {
     die('Connection failed: ' . $mysqli->connect_error);
