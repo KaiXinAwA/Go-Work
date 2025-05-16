@@ -21,8 +21,8 @@ jobs:
           php-version: '8.2'
 
       # Step 3: Install Composer dependencies
-      - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+      #- name: Install Composer dependencies
+       # run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
       # Step 4: Deploy to Azure App Service
       - name: Deploy to Azure Web App
