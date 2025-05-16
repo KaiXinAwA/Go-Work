@@ -20,8 +20,8 @@ jobs:
         with:
           php-version: '8.2'
 
-      # Step 3: Azure Login
-     - name: Azure Login
+      # ✅ Step 3: Azure Login（已修复缩进）
+      - name: Azure Login
         uses: azure/login@v1
         with:
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
@@ -31,4 +31,5 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: gowork-dkcnathua3htgtac
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: .
+
